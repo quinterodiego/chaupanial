@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Header } from '../../components/Header'
 import { Button } from '../../components/ui/button'
 import { ArrowLeft, Baby, Moon, Droplet, Star } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 type ActivityType = 'feeding' | 'sleep' | 'diaper' | 'milestone'
 
@@ -106,8 +106,13 @@ export default function RegistroPage() {
     }
   }
 
+  useEffect(() => {
+    if (!session) {
+      router.push('/')
+    }
+  }, [session, router])
+
   if (!session) {
-    router.push('/')
     return null
   }
 

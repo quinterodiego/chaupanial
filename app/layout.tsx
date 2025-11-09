@@ -9,8 +9,14 @@ export const metadata = {
   title: 'Chau Pañal - Control de Esfínteres',
   description: 'La app para acompañar a tu bebé en el proceso de control de esfínteres. Registros, seguimiento y tips para este momento tan importante.',
   manifest: '/manifest.json',
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
   themeColor: '#0ea5e9',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
 }
 
 export default function RootLayout({
