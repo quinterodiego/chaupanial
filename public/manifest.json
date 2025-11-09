@@ -1,0 +1,43 @@
+{
+  "name": "Chau Pañal - Control de Esfínteres",
+  "short_name": "Chau Pañal",
+  "description": "La app para acompañar a tu bebé en el proceso de control de esfínteres. Registros, seguimiento y tips.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0ea5e9",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["lifestyle", "health", "family"],
+  "shortcuts": [
+    {
+      "name": "Registrar esfínteres",
+      "short_name": "Registro",
+      "description": "Registrar uso del baño",
+      "url": "/dashboard/registro",
+      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Ver progreso",
+      "short_name": "Progreso",
+      "description": "Ver calendario de progreso",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+    }
+  ]
+}
