@@ -4,10 +4,20 @@ import { useState, useEffect } from 'react'
 import { Button } from './ui/button'
 import { UserPlus, Edit2, Users, Crown, X, ChevronDown, ChevronUp } from 'lucide-react'
 
+interface FamilyMember {
+  email: string
+  name: string
+  role: string
+  isOwner: boolean
+}
+
 interface FamilyInfo {
   babyName: string
-  sharedUsers: string[]
+  sharedUsers: FamilyMember[]
   familyId: string | null
+  userRole: string
+  userName: string
+  isOwner: boolean
 }
 
 interface FamilySettingsProps {
@@ -20,10 +30,24 @@ export function FamilySettings({ isPremium }: FamilySettingsProps) {
   const [isEditingName, setIsEditingName] = useState(false)
   const [babyName, setBabyName] = useState('')
   const [invitedEmail, setInvitedEmail] = useState('')
+  const [invitedRole, setInvitedRole] = useState('padre')
   const [isInviting, setIsInviting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [isExpanded, setIsExpanded] = useState(false)
+  const [editingRole, setEditingRole] = useState<{ email: string; role: string } | null>(null)
+  const [isOwner, setIsOwner] = useState(false)
+  
+  const roles = [
+    { value: 'padre', label: 'Padre' },
+    { value: 'madre', label: 'Madre' },
+    { value: 'niñera', label: 'Niñera' },
+    { value: 'abuela', label: 'Abuela' },
+    { value: 'abuelo', label: 'Abuelo' },
+    { value: 'tía', label: 'Tía' },
+    { value: 'tío', label: 'Tío' },
+    { value: 'otro', label: 'Otro' },
+  ]
 
   useEffect(() => {
     if (isPremium) {
@@ -43,6 +67,8 @@ export function FamilySettings({ isPremium }: FamilySettingsProps) {
         setFamilyInfo(data)
         const name = data.babyName || 'Bebé'
         setBabyName(name)
+        // Verificar si el usuario actual es el owner
+        setIsOwner(data.isOwner || false)
         console.log('Nombre del niño establecido:', name) // Debug
       } else {
         const errorData = await response.json()
@@ -115,6 +141,7 @@ export function FamilySettings({ isPremium }: FamilySettingsProps) {
         body: JSON.stringify({
           action: 'inviteUser',
           invitedEmail: invitedEmail.trim().toLowerCase(),
+          role: invitedRole,
         }),
       })
 
@@ -126,6 +153,7 @@ export function FamilySettings({ isPremium }: FamilySettingsProps) {
 
       setSuccess('Usuario invitado correctamente')
       setInvitedEmail('')
+      setInvitedRole('padre')
       loadFamilyInfo()
     } catch (err: any) {
       setError(err.message || 'Error al invitar usuario')
@@ -257,36 +285,129 @@ export function FamilySettings({ isPremium }: FamilySettingsProps) {
           {/* Invitar Usuario */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
-              Invitar a tu Pareja
+              Invitar Miembro de la Familia
             </label>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
               <p className="text-sm text-blue-800">
-                <strong>📧 Importante:</strong> Tu pareja debe estar registrada en Chau Pañal con el mismo email que ingreses.
+                <strong>📧 Importante:</strong> El miembro debe estar registrado en Chau Pañal con el mismo email que ingreses.
               </p>
               <p className="text-xs text-blue-600 mt-1">
                 Si aún no se registró, debe hacerlo primero desde la página principal con su cuenta de Google.
               </p>
             </div>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                value={invitedEmail}
-                onChange={(e) => setInvitedEmail(e.target.value)}
-                placeholder="Email de tu pareja (ej: papa@gmail.com)"
-                className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              />
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  value={invitedEmail}
+                  onChange={(e) => setInvitedEmail(e.target.value)}
+                  placeholder="Email del miembro (ej: papa@gmail.com)"
+                  className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+                <select
+                  value={invitedRole}
+                  onChange={(e) => setInvitedRole(e.target.value)}
+                  className="w-40 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                >
+                  {roles.map(role => (
+                    <option key={role.value} value={role.value}>{role.label}</option>
+                  ))}
+                </select>
+              </div>
               <Button
                 onClick={handleInviteUser}
                 disabled={isInviting || !invitedEmail.trim()}
-                className="bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] hover:from-[#98C8DA] hover:to-[#EFA3AA] text-white"
+                className="w-full bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] hover:from-[#98C8DA] hover:to-[#EFA3AA] text-white"
               >
                 <UserPlus className="mr-2" size={16} />
                 {isInviting ? 'Enviando...' : 'Invitar'}
               </Button>
             </div>
             <p className="text-xs text-gray-500 mt-2">
-              Una vez invitado, tu pareja verá automáticamente los registros compartidos la próxima vez que inicie sesión.
+              Una vez invitado, el miembro verá automáticamente los registros compartidos la próxima vez que inicie sesión.
             </p>
+          </div>
+
+          {/* Mi Rol Actual */}
+          <div className="pb-6 border-b border-gray-200">
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Mi Rol en la Familia
+            </label>
+            {editingRole?.email === 'me' ? (
+              <div className="space-y-3">
+                <select
+                  value={editingRole.role}
+                  onChange={(e) => setEditingRole({ ...editingRole, role: e.target.value })}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                >
+                  {roles.map(role => (
+                    <option key={role.value} value={role.value}>{role.label}</option>
+                  ))}
+                </select>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={async () => {
+                      try {
+                        setError(null)
+                        const response = await fetch('/api/family', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            action: 'updateMyRole',
+                            newRole: editingRole.role,
+                          }),
+                        })
+
+                        const data = await response.json()
+
+                        if (!response.ok) {
+                          throw new Error(data.error || 'Error al actualizar rol')
+                        }
+
+                        setSuccess('Rol actualizado correctamente')
+                        setEditingRole(null)
+                        loadFamilyInfo()
+                      } catch (err: any) {
+                        setError(err.message || 'Error al actualizar rol')
+                      }
+                    }}
+                    className="bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] hover:from-[#98C8DA] hover:to-[#EFA3AA] text-white"
+                  >
+                    Guardar
+                  </Button>
+                  <Button
+                    onClick={() => setEditingRole(null)}
+                    variant="outline"
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-2 flex-1">
+                  <Users className="text-gray-400" size={16} />
+                  <div className="flex-1">
+                    <span className="text-sm font-medium text-gray-800 block">
+                      {familyInfo?.userName || 'Usuario'}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {roles.find(r => r.value === familyInfo?.userRole)?.label || 'Padre'}
+                    </span>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => setEditingRole({ email: 'me', role: familyInfo?.userRole || 'padre' })}
+                  variant="ghost"
+                  size="sm"
+                >
+                  <Edit2 className="mr-2" size={14} />
+                  Editar
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Usuarios Compartidos */}
@@ -296,15 +417,90 @@ export function FamilySettings({ isPremium }: FamilySettingsProps) {
                 Miembros de la Familia
               </label>
               <div className="space-y-2">
-                {familyInfo.sharedUsers.map((email, index) => (
+                {familyInfo.sharedUsers.map((member, index) => (
                   <div
                     key={index}
                     className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-1">
                       <Users className="text-gray-400" size={16} />
-                      <span className="text-sm text-gray-700">{email}</span>
+                      <div className="flex-1">
+                        <span className="text-sm font-medium text-gray-800 block">{member.name}</span>
+                        <span className="text-xs text-gray-500 block">{member.email}</span>
+                        {editingRole?.email === member.email ? (
+                          <div className="mt-2 space-y-2">
+                            <select
+                              value={editingRole.role}
+                              onChange={(e) => setEditingRole({ ...editingRole, role: e.target.value })}
+                              className="w-full p-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            >
+                              {roles.map(role => (
+                                <option key={role.value} value={role.value}>{role.label}</option>
+                              ))}
+                            </select>
+                            <div className="flex gap-2">
+                              <Button
+                                onClick={async () => {
+                                  try {
+                                    setError(null)
+                                    const response = await fetch('/api/family', {
+                                      method: 'POST',
+                                      headers: {
+                                        'Content-Type': 'application/json',
+                                      },
+                                      body: JSON.stringify({
+                                        action: 'updateUserRole',
+                                        targetEmail: member.email,
+                                        newRole: editingRole.role,
+                                      }),
+                                    })
+
+                                    const data = await response.json()
+
+                                    if (!response.ok) {
+                                      throw new Error(data.error || 'Error al actualizar rol')
+                                    }
+
+                                    setSuccess('Rol actualizado correctamente')
+                                    setEditingRole(null)
+                                    loadFamilyInfo()
+                                  } catch (err: any) {
+                                    setError(err.message || 'Error al actualizar rol')
+                                  }
+                                }}
+                                size="sm"
+                                className="bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] hover:from-[#98C8DA] hover:to-[#EFA3AA] text-white text-xs"
+                              >
+                                Guardar
+                              </Button>
+                              <Button
+                                onClick={() => setEditingRole(null)}
+                                variant="outline"
+                                size="sm"
+                                className="text-xs"
+                              >
+                                Cancelar
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-500">
+                            {roles.find(r => r.value === member.role)?.label || 'Padre'}
+                            {member.isOwner && ' (Dueño)'}
+                          </span>
+                        )}
+                      </div>
                     </div>
+                    {isOwner && !member.isOwner && !editingRole && (
+                      <Button
+                        onClick={() => setEditingRole({ email: member.email, role: member.role })}
+                        variant="ghost"
+                        size="sm"
+                      >
+                        <Edit2 className="mr-2" size={14} />
+                        Editar Rol
+                      </Button>
+                    )}
                   </div>
                 ))}
               </div>

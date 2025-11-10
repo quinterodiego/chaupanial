@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { action, babyName, invitedEmail } = body
+    const { action, babyName, invitedEmail, role, targetEmail, newRole } = body
 
     if (action === 'updateBabyName') {
       // Actualizar nombre del niño
@@ -72,7 +72,8 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      const result = await GoogleSheetsService.inviteUserToFamily(session.user.email, invitedEmail)
+      const userRole = role || 'padre' // Por defecto 'padre'
+      const result = await GoogleSheetsService.inviteUserToFamily(session.user.email, invitedEmail, userRole)
       
       if (!result.success) {
         return NextResponse.json(
@@ -82,6 +83,48 @@ export async function POST(request: NextRequest) {
       }
 
       return NextResponse.json({ success: true, message: 'Usuario invitado correctamente' })
+    }
+
+    if (action === 'updateUserRole') {
+      // Actualizar rol de otro usuario (solo owner)
+      if (!targetEmail || !newRole) {
+        return NextResponse.json(
+          { error: 'Email y rol requeridos' },
+          { status: 400 }
+        )
+      }
+
+      const result = await GoogleSheetsService.updateUserRole(session.user.email, targetEmail, newRole)
+      
+      if (!result.success) {
+        return NextResponse.json(
+          { error: result.error || 'Error al actualizar rol' },
+          { status: 500 }
+        )
+      }
+
+      return NextResponse.json({ success: true, message: 'Rol actualizado correctamente' })
+    }
+
+    if (action === 'updateMyRole') {
+      // Actualizar rol del usuario actual
+      if (!newRole) {
+        return NextResponse.json(
+          { error: 'Rol requerido' },
+          { status: 400 }
+        )
+      }
+
+      const result = await GoogleSheetsService.updateMyRole(session.user.email, newRole)
+      
+      if (!result.success) {
+        return NextResponse.json(
+          { error: result.error || 'Error al actualizar rol' },
+          { status: 500 }
+        )
+      }
+
+      return NextResponse.json({ success: true, message: 'Rol actualizado correctamente' })
     }
 
     return NextResponse.json(

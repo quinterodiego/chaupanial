@@ -458,14 +458,17 @@ export class GoogleSheetsService {
       // Intentar obtener información de la hoja Familias
       let familyInfo = {
         babyName: 'Bebé',
-        sharedUsers: [] as string[],
+        sharedUsers: [] as Array<{ email: string; name: string; role: string; isOwner: boolean }>,
         familyId: null as string | null,
+        userRole: 'padre' as string,
+        userName: '' as string,
+        isOwner: false as boolean,
       }
 
       try {
         const response = await sheets.spreadsheets.values.get({
           spreadsheetId: SPREADSHEET_ID,
-          range: 'Familias!A:D', // A=FamilyID, B=UserEmail, C=BabyName, D=IsOwner
+          range: 'Familias!A:E', // A=FamilyID, B=UserEmail, C=BabyName, D=IsOwner, E=Role
         })
 
         const rows = response.data.values
@@ -497,10 +500,46 @@ export class GoogleSheetsService {
               }
             }
             
-            // Obtener emails de usuarios compartidos (excluyendo al usuario actual)
-            familyInfo.sharedUsers = familyMembers
+            // Obtener información de usuarios compartidos (excluyendo al usuario actual)
+            // Primero obtener todos los emails de la familia
+            const familyEmails = familyMembers
               .filter(row => row[1] !== userEmail)
               .map(row => row[1])
+            
+            // Obtener nombres de los usuarios desde la hoja Usuarios
+            const usersInfo = await Promise.all(
+              familyEmails.map(async (email) => {
+                const userInfo = await this.getUserByEmail(email)
+                return {
+                  email,
+                  name: userInfo.name || email.split('@')[0], // Si no tiene nombre, usar parte del email
+                }
+              })
+            )
+            
+            // Crear mapa de emails a nombres
+            const emailToName = new Map(usersInfo.map(u => [u.email, u.name]))
+            
+            // Mapear miembros con sus nombres
+            familyInfo.sharedUsers = familyMembers
+              .filter(row => row[1] !== userEmail)
+              .map(row => ({
+                email: row[1],
+                name: emailToName.get(row[1]) || row[1].split('@')[0], // Nombre o parte del email
+                role: row[4] || 'padre', // E=Role, por defecto 'padre'
+                isOwner: row[3] === 'true' || row[3] === true || row[3] === 'TRUE',
+              }))
+            
+            // Obtener el rol del usuario actual, nombre y si es owner
+            const currentUser = familyMembers.find(row => row[1] === userEmail)
+            if (currentUser) {
+              familyInfo.userRole = currentUser[4] || 'padre'
+              familyInfo.isOwner = currentUser[3] === 'true' || currentUser[3] === true || currentUser[3] === 'TRUE'
+              
+              // Obtener el nombre del usuario actual desde la hoja Usuarios
+              const currentUserInfo = await this.getUserByEmail(userEmail)
+              familyInfo.userName = currentUserInfo.name || userEmail.split('@')[0]
+            }
           }
         }
       } catch (error) {
@@ -517,6 +556,9 @@ export class GoogleSheetsService {
         babyName: 'Bebé',
         sharedUsers: [],
         familyId: null,
+        userRole: 'padre',
+        userName: '',
+        isOwner: false,
       }
     }
   }
@@ -564,10 +606,10 @@ export class GoogleSheetsService {
           // Crear los headers
           await sheets.spreadsheets.values.update({
             spreadsheetId: SPREADSHEET_ID,
-            range: 'Familias!A1:D1',
+            range: 'Familias!A1:E1',
             valueInputOption: 'RAW',
             requestBody: {
-              values: [['FamilyID', 'UserEmail', 'BabyName', 'IsOwner']],
+              values: [['FamilyID', 'UserEmail', 'BabyName', 'IsOwner', 'Role']],
             },
           })
         } catch (createError) {
@@ -577,10 +619,10 @@ export class GoogleSheetsService {
           try {
             await sheets.spreadsheets.values.update({
               spreadsheetId: SPREADSHEET_ID,
-              range: 'Familias!A1:D1',
+              range: 'Familias!A1:E1',
               valueInputOption: 'RAW',
               requestBody: {
-                values: [['FamilyID', 'UserEmail', 'BabyName', 'IsOwner']],
+                values: [['FamilyID', 'UserEmail', 'BabyName', 'IsOwner', 'Role']],
               },
             })
           } catch (updateError) {
@@ -593,13 +635,13 @@ export class GoogleSheetsService {
       // Generar un ID único para la familia
       const familyId = `family-${Date.now()}-${Math.random().toString(36).substring(7)}`
 
-      // Agregar el owner a la familia
+      // Agregar el owner a la familia (por defecto rol 'padre')
       await sheets.spreadsheets.values.append({
         spreadsheetId: SPREADSHEET_ID,
-        range: 'Familias!A:D',
+        range: 'Familias!A:E',
         valueInputOption: 'RAW',
         requestBody: {
-          values: [[familyId, ownerEmail, babyName, true]],
+          values: [[familyId, ownerEmail, babyName, true, 'padre']],
         },
       })
 
@@ -632,7 +674,7 @@ export class GoogleSheetsService {
       // Actualizar el nombre del niño en todos los registros de la familia
       const response = await sheets.spreadsheets.values.get({
         spreadsheetId: SPREADSHEET_ID,
-        range: 'Familias!A:D',
+        range: 'Familias!A:E',
       })
 
       const rows = response.data.values
@@ -694,7 +736,7 @@ export class GoogleSheetsService {
   }
 
   // Invitar usuario a la familia
-  static async inviteUserToFamily(ownerEmail: string, invitedEmail: string) {
+  static async inviteUserToFamily(ownerEmail: string, invitedEmail: string, role: string = 'padre') {
     try {
       const familyInfo = await this.getFamilyInfo(ownerEmail)
       
@@ -716,23 +758,129 @@ export class GoogleSheetsService {
       }
 
       // Verificar que el usuario invitado no esté ya en la familia
-      if (familyInfo.sharedUsers.includes(invitedEmail)) {
+      if (familyInfo.sharedUsers.some(user => user.email === invitedEmail)) {
         return { success: false, error: 'El usuario ya está en la familia' }
       }
 
       // Agregar el usuario invitado a la familia
       await sheets.spreadsheets.values.append({
         spreadsheetId: SPREADSHEET_ID,
-        range: 'Familias!A:D',
+        range: 'Familias!A:E',
         valueInputOption: 'RAW',
         requestBody: {
-          values: [[familyInfo.familyId, invitedEmail, familyInfo.babyName, false]],
+          values: [[familyInfo.familyId, invitedEmail, familyInfo.babyName, false, role]],
         },
       })
 
       return { success: true }
     } catch (error) {
       console.error('Error invitando usuario:', error)
+      return { success: false, error }
+    }
+  }
+
+  // Actualizar rol de un usuario en la familia
+  static async updateUserRole(userEmail: string, targetEmail: string, newRole: string) {
+    try {
+      const familyInfo = await this.getFamilyInfo(userEmail)
+      
+      if (!familyInfo.familyId) {
+        return { success: false, error: 'No se encontró la familia' }
+      }
+
+      // Verificar que el usuario que hace la solicitud es el owner
+      const response = await sheets.spreadsheets.values.get({
+        spreadsheetId: SPREADSHEET_ID,
+        range: 'Familias!A:E',
+      })
+
+      const rows = response.data.values
+      if (!rows || rows.length === 0) {
+        return { success: false, error: 'No se encontraron familias' }
+      }
+
+      // Verificar que el usuario actual es el owner
+      const currentUserRow = rows.find((row, index) => index > 0 && row[1] === userEmail)
+      if (!currentUserRow || (currentUserRow[3] !== 'true' && currentUserRow[3] !== true && currentUserRow[3] !== 'TRUE')) {
+        return { success: false, error: 'Solo el dueño de la familia puede actualizar roles' }
+      }
+
+      // Buscar la fila del usuario objetivo
+      const targetUserRowIndex = rows.findIndex((row, index) => {
+        if (index === 0) return false // Saltar header
+        return row[0] === familyInfo.familyId && row[1] === targetEmail
+      })
+
+      if (targetUserRowIndex === -1) {
+        return { success: false, error: 'Usuario no encontrado en la familia' }
+      }
+
+      // La fila en Sheets es targetUserRowIndex + 1 (porque las filas empiezan en 1)
+      const sheetRow = targetUserRowIndex + 1
+
+      // Actualizar el rol
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: SPREADSHEET_ID,
+        range: `Familias!E${sheetRow}`,
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: [[newRole]],
+        },
+      })
+
+      return { success: true }
+    } catch (error) {
+      console.error('Error actualizando rol:', error)
+      return { success: false, error }
+    }
+  }
+
+  // Actualizar el rol del usuario actual
+  static async updateMyRole(userEmail: string, newRole: string) {
+    try {
+      const familyInfo = await this.getFamilyInfo(userEmail)
+      
+      if (!familyInfo.familyId) {
+        return { success: false, error: 'No se encontró la familia' }
+      }
+
+      // Obtener todas las filas de la familia
+      const response = await sheets.spreadsheets.values.get({
+        spreadsheetId: SPREADSHEET_ID,
+        range: 'Familias!A:E',
+      })
+
+      const rows = response.data.values
+      if (!rows || rows.length === 0) {
+        return { success: false, error: 'No se encontraron familias' }
+      }
+
+      // Buscar la fila del usuario actual
+      const userRowIndex = rows.findIndex((row, index) => {
+        if (index === 0) return false // Saltar header
+        return row[0] === familyInfo.familyId && row[1] === userEmail
+      })
+
+      if (userRowIndex === -1) {
+        return { success: false, error: 'Usuario no encontrado en la familia' }
+      }
+
+      // La fila en Sheets es userRowIndex + 1 (porque las filas empiezan en 1)
+      const sheetRow = userRowIndex + 1
+
+      // Actualizar el rol
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: SPREADSHEET_ID,
+        range: `Familias!E${sheetRow}`,
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: [[newRole]],
+        },
+      })
+
+      return { success: true }
+    } catch (error) {
+      console.error('Error actualizando mi rol:', error)
       return { success: false, error }
     }
   }
