@@ -229,6 +229,14 @@ export function FamilySettings({ isPremium }: FamilySettingsProps) {
         <label className="block text-sm font-medium text-gray-700 mb-3">
           Invitar a tu Pareja
         </label>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+          <p className="text-sm text-blue-800">
+            <strong>📧 Importante:</strong> Tu pareja debe estar registrada en Chau Pañal con el mismo email que ingreses.
+          </p>
+          <p className="text-xs text-blue-600 mt-1">
+            Si aún no se registró, debe hacerlo primero desde la página principal con su cuenta de Google.
+          </p>
+        </div>
         <div className="flex gap-2">
           <input
             type="email"
@@ -247,7 +255,7 @@ export function FamilySettings({ isPremium }: FamilySettingsProps) {
           </Button>
         </div>
         <p className="text-xs text-gray-500 mt-2">
-          La persona debe estar registrada en Chau Pañal para poder ser invitada.
+          Una vez invitado, tu pareja verá automáticamente los registros compartidos la próxima vez que inicie sesión.
         </p>
       </div>
 
