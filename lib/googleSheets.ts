@@ -354,10 +354,21 @@ export class GoogleSheetsService {
             // Obtener todos los usuarios de esta familia
             const familyMembers = rows.filter((row, index) => index > 0 && row[0] === familyId)
             
-            // Obtener el nombre del niño (del owner)
-            const owner = familyMembers.find(row => row[3] === 'true' || row[3] === true)
-            if (owner && owner[2]) {
-              familyInfo.babyName = owner[2]
+            // Obtener el nombre del niño (del owner o de cualquier miembro de la familia)
+            // Primero intentar del owner
+            const owner = familyMembers.find(row => {
+              const isOwner = row[3]
+              return isOwner === 'true' || isOwner === true || isOwner === 'TRUE'
+            })
+            
+            if (owner && owner[2] && owner[2].trim()) {
+              familyInfo.babyName = owner[2].trim()
+            } else {
+              // Si no hay owner o no tiene nombre, buscar en cualquier miembro de la familia
+              const memberWithName = familyMembers.find(row => row[2] && row[2].trim())
+              if (memberWithName && memberWithName[2]) {
+                familyInfo.babyName = memberWithName[2].trim()
+              }
             }
             
             // Obtener emails de usuarios compartidos (excluyendo al usuario actual)
@@ -394,15 +405,63 @@ export class GoogleSheetsService {
           range: 'Familias!A1',
         })
       } catch (error) {
-        // Crear la hoja Familias con headers
-        await sheets.spreadsheets.values.update({
-          spreadsheetId: SPREADSHEET_ID,
-          range: 'Familias!A1:D1',
-          valueInputOption: 'RAW',
-          requestBody: {
-            values: [['FamilyID', 'UserEmail', 'BabyName', 'IsOwner']],
-          },
-        })
+        // La hoja no existe, intentar crearla
+        try {
+          // Obtener información del spreadsheet para ver las hojas existentes
+          const spreadsheet = await sheets.spreadsheets.get({
+            spreadsheetId: SPREADSHEET_ID,
+          })
+          
+          const existingSheets = spreadsheet.data.sheets?.map(s => s.properties?.title) || []
+          
+          if (!existingSheets.includes('Familias')) {
+            // Crear la hoja Familias usando batchUpdate
+            await sheets.spreadsheets.batchUpdate({
+              spreadsheetId: SPREADSHEET_ID,
+              requestBody: {
+                requests: [
+                  {
+                    addSheet: {
+                      properties: {
+                        title: 'Familias',
+                      },
+                    },
+                  },
+                ],
+              },
+            })
+          }
+          
+          // Esperar un momento para que la hoja se cree
+          await new Promise(resolve => setTimeout(resolve, 500))
+          
+          // Crear los headers
+          await sheets.spreadsheets.values.update({
+            spreadsheetId: SPREADSHEET_ID,
+            range: 'Familias!A1:D1',
+            valueInputOption: 'RAW',
+            requestBody: {
+              values: [['FamilyID', 'UserEmail', 'BabyName', 'IsOwner']],
+            },
+          })
+        } catch (createError) {
+          console.error('Error creando hoja Familias:', createError)
+          // Si no se puede crear la hoja, intentar usar update directamente
+          // (puede que la hoja exista pero esté vacía)
+          try {
+            await sheets.spreadsheets.values.update({
+              spreadsheetId: SPREADSHEET_ID,
+              range: 'Familias!A1:D1',
+              valueInputOption: 'RAW',
+              requestBody: {
+                values: [['FamilyID', 'UserEmail', 'BabyName', 'IsOwner']],
+              },
+            })
+          } catch (updateError) {
+            console.error('Error actualizando hoja Familias:', updateError)
+            return { success: false, error: 'No se pudo crear la hoja Familias. Verifica que tengas permisos y que la hoja exista en Google Sheets.' }
+          }
+        }
       }
 
       // Generar un ID único para la familia
@@ -428,11 +487,20 @@ export class GoogleSheetsService {
   // Actualizar nombre del niño
   static async updateBabyName(userEmail: string, babyName: string) {
     try {
-      const familyInfo = await this.getFamilyInfo(userEmail)
+      let familyInfo = await this.getFamilyInfo(userEmail)
       
       if (!familyInfo.familyId) {
         // Si no tiene familia, crear una
-        return await this.createFamily(userEmail, babyName)
+        const createResult = await this.createFamily(userEmail, babyName)
+        if (!createResult.success) {
+          return createResult
+        }
+        // Obtener la información actualizada
+        familyInfo = await this.getFamilyInfo(userEmail)
+      }
+
+      if (!familyInfo.familyId) {
+        return { success: false, error: 'No se pudo crear o encontrar la familia' }
       }
 
       // Actualizar el nombre del niño en todos los registros de la familia
@@ -449,15 +517,21 @@ export class GoogleSheetsService {
       // Actualizar todas las filas de esta familia
       const familyRows = rows
         .map((row, index) => ({ row, index: index + 1 }))
-        .filter(({ row }) => row[0] === familyInfo.familyId)
+        .filter(({ row, index }) => index > 0 && row[0] === familyInfo.familyId)
 
-      for (const { index } of familyRows) {
+      // Actualizar todas las filas de la familia en un solo batch
+      const updateRequests = familyRows.map(({ index }) => ({
+        range: `Familias!C${index}`,
+        values: [[babyName]],
+      }))
+
+      for (const updateRequest of updateRequests) {
         await sheets.spreadsheets.values.update({
           spreadsheetId: SPREADSHEET_ID,
-          range: `Familias!C${index}`,
+          range: updateRequest.range,
           valueInputOption: 'RAW',
           requestBody: {
-            values: [[babyName]],
+            values: updateRequest.values,
           },
         })
       }

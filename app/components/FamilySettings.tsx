@@ -38,8 +38,14 @@ export function FamilySettings({ isPremium }: FamilySettingsProps) {
       const response = await fetch('/api/family')
       if (response.ok) {
         const data = await response.json()
+        console.log('Información de familia cargada:', data) // Debug
         setFamilyInfo(data)
-        setBabyName(data.babyName || 'Bebé')
+        const name = data.babyName || 'Bebé'
+        setBabyName(name)
+        console.log('Nombre del niño establecido:', name) // Debug
+      } else {
+        const errorData = await response.json()
+        console.error('Error en respuesta:', response.status, errorData)
       }
     } catch (error) {
       console.error('Error cargando información de familia:', error)
