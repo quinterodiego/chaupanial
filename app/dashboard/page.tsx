@@ -8,6 +8,7 @@ import { Plus, Baby, Calendar, TrendingUp, Crown, AlertCircle, Droplet, X, Eye, 
 import { useEffect, useState } from 'react'
 import { CalendarView } from '../components/CalendarView'
 import { ChartsView } from '../components/ChartsView'
+import { FamilySettings } from '../components/FamilySettings'
 
 interface Activity {
   id: string
@@ -270,6 +271,13 @@ export default function Dashboard() {
                 Ver Premium
               </Button>
             </div>
+          </div>
+        )}
+
+        {/* Gestión de Familia (Premium) */}
+        {isPremium && (
+          <div className="mb-8">
+            <FamilySettings isPremium={isPremium} />
           </div>
         )}
 

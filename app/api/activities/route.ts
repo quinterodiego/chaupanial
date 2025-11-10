@@ -18,9 +18,14 @@ export async function GET(request: NextRequest) {
     const isPremium = session.user.isPremium || false
 
     // Obtener actividades desde Google Sheets
-    const result = await GoogleSheetsService.getActivities(session.user.email, {
-      limit: limit,
-    })
+    // Si es Premium, usar getSharedActivities para incluir registros compartidos
+    const result = isPremium
+      ? await GoogleSheetsService.getSharedActivities(session.user.email, {
+          limit: limit,
+        })
+      : await GoogleSheetsService.getActivities(session.user.email, {
+          limit: limit,
+        })
 
     // Si no es premium, filtrar solo últimos 30 días
     const now = new Date()
@@ -90,10 +95,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Si es Premium, obtener el nombre del niño de la familia
+    let finalBabyName = babyName || 'Bebé'
+    if (isPremium && !babyName) {
+      const familyInfo = await GoogleSheetsService.getFamilyInfo(session.user.email!)
+      finalBabyName = familyInfo.babyName || 'Bebé'
+    }
+
     // Guardar actividad en Google Sheets
     const result = await GoogleSheetsService.saveActivity({
       userEmail: session.user.email!,
-      babyName: babyName || 'Bebé',
+      babyName: finalBabyName,
       activityType: type,
       details: details || {},
       timestamp: activityTimestamp,
