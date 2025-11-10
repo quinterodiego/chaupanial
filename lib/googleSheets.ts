@@ -418,7 +418,7 @@ export class GoogleSheetsService {
         },
       })
 
-      return { success: true, familyId }
+      return { success: true, familyId: familyId as string }
     } catch (error) {
       console.error('Error creando familia:', error)
       return { success: false, error }
@@ -505,7 +505,7 @@ export class GoogleSheetsService {
           return { success: false, error: 'Error al crear familia' }
         }
         const newFamilyInfo = await this.getFamilyInfo(ownerEmail)
-        familyInfo.familyId = newFamilyInfo.familyId || result.familyId
+        familyInfo.familyId = newFamilyInfo.familyId || result.familyId || null
         familyInfo.babyName = newFamilyInfo.babyName
       }
 
