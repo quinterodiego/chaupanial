@@ -12,14 +12,30 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
-    // Por ahora retornamos datos vacíos, luego implementamos la lectura desde Sheets
-    // TODO: Implementar lectura desde Google Sheets
-    const activities: any[] = []
-    const monthlyCount = 0
+    // Obtener parámetros de la URL
+    const { searchParams } = new URL(request.url)
+    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined
+    const isPremium = session.user.isPremium || false
+
+    // Obtener actividades desde Google Sheets
+    const result = await GoogleSheetsService.getActivities(session.user.email, {
+      limit: limit,
+    })
+
+    // Si no es premium, filtrar solo últimos 30 días
+    const now = new Date()
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+    
+    const activities = isPremium
+      ? result.activities
+      : result.activities.filter(activity => {
+          const activityDate = new Date(activity.timestamp)
+          return activityDate >= thirtyDaysAgo
+        })
 
     return NextResponse.json({
       activities,
-      monthlyCount,
+      monthlyCount: result.monthlyCount,
     })
   } catch (error) {
     console.error('Error obteniendo actividades:', error)
@@ -40,15 +56,18 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { type, details, babyName } = body
+    const { type, details, babyName, timestamp } = body
 
     // Validar tipo de actividad
-    if (!['feeding', 'sleep', 'diaper', 'milestone'].includes(type)) {
+    if (!['feeding', 'sleep', 'diaper', 'milestone', 'esfinteres'].includes(type)) {
       return NextResponse.json(
         { error: 'Tipo de actividad inválido' },
         { status: 400 }
       )
     }
+
+    // Usar timestamp personalizado si se proporciona, sino usar la fecha actual
+    const activityTimestamp = timestamp ? new Date(timestamp) : new Date()
 
     // Verificar límites de versión gratuita
     const isPremium = session.user.isPremium || false
@@ -77,7 +96,7 @@ export async function POST(request: NextRequest) {
       babyName: babyName || 'Bebé',
       activityType: type,
       details: details || {},
-      timestamp: new Date(),
+      timestamp: activityTimestamp,
     })
 
     if (!result.success) {

@@ -1,8 +1,8 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Header } from './components/Header'
-import { useSession } from 'next-auth/react'
+import { useSession, signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Button } from './components/ui/button'
 import { 
@@ -12,15 +12,22 @@ import {
 } from 'lucide-react'
 
 export default function Home() {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const router = useRouter()
+
+  // Redirigir usuarios autenticados al dashboard
+  useEffect(() => {
+    if (status === 'authenticated' && session) {
+      router.push('/dashboard')
+    }
+  }, [status, session, router])
 
   const handleGetStarted = () => {
     if (session) {
       router.push('/dashboard')
     } else {
-      // Redirigir a login o mostrar modal
-      router.push('/api/auth/signin')
+      // Redirigir a login con callback al dashboard
+      signIn('google', { callbackUrl: '/dashboard' })
     }
   }
 
@@ -45,14 +52,14 @@ export default function Home() {
               </span>
             </div>
             
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold text-gray-900 mb-6 leading-tight tracking-tight">
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold text-gray-700 mb-6 leading-tight tracking-tight">
               Chau{' '}
               <span className="gradient-text">
                 Pañal
               </span>
             </h1>
             
-            <p className="text-xl md:text-2xl lg:text-3xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed font-light">
+            <p className="text-xl md:text-2xl lg:text-3xl text-gray-700 mb-10 max-w-3xl mx-auto leading-relaxed font-light">
               La app para acompañar a tu bebé en el proceso de{' '}
               <span className="font-semibold text-gray-800">control de esfínteres</span>.
               <br className="hidden md:block" />
@@ -64,7 +71,7 @@ export default function Home() {
                 <>
                   <Button 
                     size="lg" 
-                    className="text-lg px-10 py-7 bg-gradient-to-r from-[#A8D8EA] via-[#B8E0F0] to-[#FFB3BA] hover:from-[#98C8DA] hover:via-[#A8D0E0] hover:to-[#EFA3AA] text-gray-800 shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 font-semibold"
+                    className="text-lg px-10 py-7 bg-gradient-to-r from-[#A8D8EA] via-[#B8E0F0] to-[#FFB3BA] hover:from-[#98C8DA] hover:via-[#A8D0E0] hover:to-[#EFA3AA] text-gray-700 shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 font-semibold"
                     onClick={handleGetStarted}
                   >
                     🚀 Comenzar Gratis
@@ -73,7 +80,7 @@ export default function Home() {
                   <Button 
                     size="lg" 
                     variant="outline"
-                    className="text-lg px-10 py-7 border-2 border-gray-300 hover:border-primary-400 hover:bg-primary-50 transition-all transform hover:scale-105 font-semibold"
+                    className="text-lg px-10 py-7 border-2 border-gray-300 hover:border-primary-400 hover:bg-primary-50 transition-all transform hover:scale-105 font-semibold text-gray-700"
                     onClick={() => router.push('/premium')}
                   >
                     <Crown className="mr-2" size={20} />
@@ -96,15 +103,15 @@ export default function Home() {
             <div className="grid grid-cols-3 gap-8 max-w-3xl mx-auto mt-20">
               <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover-lift">
                 <div className="text-4xl md:text-5xl font-extrabold gradient-text mb-2">1000+</div>
-                <div className="text-sm text-gray-600 font-medium">Padres activos</div>
+                <div className="text-sm text-gray-700 font-medium">Padres activos</div>
               </div>
               <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover-lift">
                 <div className="text-4xl md:text-5xl font-extrabold gradient-text mb-2">5000+</div>
-                <div className="text-sm text-gray-600 font-medium">Registros de esfínteres</div>
+                <div className="text-sm text-gray-700 font-medium">Registros de esfínteres</div>
               </div>
               <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover-lift">
                 <div className="text-4xl md:text-5xl font-extrabold gradient-text mb-2">4.9★</div>
-                <div className="text-sm text-gray-600 font-medium">Valoración</div>
+                <div className="text-sm text-gray-700 font-medium">Valoración</div>
               </div>
             </div>
           </div>
@@ -113,10 +120,10 @@ export default function Home() {
         {/* Features Section */}
         <section className="relative container mx-auto px-4 py-24 bg-gray-50">
           <div className="text-center mb-16 animate-fade-in">
-            <h2 className="text-4xl md:text-6xl font-extrabold text-gray-900 mb-6 tracking-tight">
+            <h2 className="text-4xl md:text-6xl font-extrabold text-gray-700 mb-6 tracking-tight">
               Todo para el control de esfínteres
             </h2>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto font-light">
+            <p className="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto font-light">
               Funcionalidades diseñadas para acompañar a tu bebé en este proceso tan importante
             </p>
           </div>
@@ -164,10 +171,10 @@ export default function Home() {
         {/* Pricing Section */}
         <section className="container mx-auto px-4 py-16 bg-gray-50">
           <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-700 mb-4">
               Planes que se adaptan a ti
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-700 max-w-2xl mx-auto">
               Comienza gratis y actualiza cuando lo necesites
             </p>
           </div>
@@ -176,11 +183,11 @@ export default function Home() {
             {/* Free Plan */}
             <div className="bg-white rounded-3xl shadow-xl p-8 border-2 border-gray-200">
               <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold mb-2">Gratis</h3>
-                <div className="text-5xl font-bold text-gray-900 mb-2">
+                <h3 className="text-2xl font-bold mb-2 text-gray-700">Gratis</h3>
+                <div className="text-5xl font-bold text-gray-700 mb-2">
                   $0
                 </div>
-                <p className="text-gray-600">Siempre gratis</p>
+                <p className="text-gray-700">Siempre gratis</p>
               </div>
               
               <ul className="space-y-4 mb-8">
@@ -219,12 +226,12 @@ export default function Home() {
             {/* Premium Plan */}
             <div className="bg-gradient-to-br from-[#A8D8EA] to-[#FFB3BA] rounded-3xl shadow-2xl p-8 border-4 border-yellow-300 relative transform scale-105">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <span className="bg-yellow-400 text-gray-900 px-6 py-2 rounded-full text-sm font-bold shadow-lg">
+                <span className="bg-yellow-400 text-gray-700 px-6 py-2 rounded-full text-sm font-bold shadow-lg">
                   ⭐ Más Popular
                 </span>
               </div>
               
-              <div className="text-center mb-8 text-gray-800">
+              <div className="text-center mb-8 text-gray-700">
                 <div className="flex items-center justify-center mb-2">
                   <Crown className="text-yellow-500 mr-2" size={24} />
                   <h3 className="text-2xl font-bold">Premium</h3>
@@ -238,7 +245,7 @@ export default function Home() {
               <ul className="space-y-4 mb-8 text-gray-800">
                 <li className="flex items-start">
                   <CheckCircle className="text-yellow-500 mr-3 mt-1 flex-shrink-0" size={20} />
-                  <span><strong>Todo lo gratis +</strong></span>
+                  <span className="text-gray-700"><strong>Todo lo gratis +</strong></span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="text-yellow-500 mr-3 mt-1 flex-shrink-0" size={20} />
@@ -285,10 +292,10 @@ export default function Home() {
         {/* Testimonials Section */}
         <section className="container mx-auto px-4 py-16 bg-gray-50">
           <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-700 mb-4">
               Lo que dicen los padres
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-700 max-w-2xl mx-auto">
               Miles de padres confían en Chau Pañal
             </p>
           </div>
@@ -318,7 +325,7 @@ export default function Home() {
         {/* FAQ Section */}
         <section className="container mx-auto px-4 py-16 bg-gray-50">
           <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-700 mb-4">
               Preguntas frecuentes
             </h2>
           </div>
@@ -348,7 +355,7 @@ export default function Home() {
         </section>
 
         {/* Final CTA Section */}
-        <section className="container mx-auto px-4 py-20 bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] text-gray-800 text-center">
+        <section className="container mx-auto px-4 py-20 bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] text-gray-700 text-center">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-4xl md:text-6xl font-bold mb-6">
               ¿Listo para comenzar?
@@ -370,7 +377,7 @@ export default function Home() {
                   <Button 
                     size="lg" 
                     variant="outline"
-                    className="border-2 border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white text-lg px-8 py-6"
+                    className="border-2 border-gray-700 text-gray-700 hover:bg-gray-700 hover:text-white text-lg px-8 py-6"
                     onClick={() => router.push('/premium')}
                   >
                     <Crown className="mr-2" size={20} />
@@ -421,8 +428,8 @@ function FeatureCard({ icon, title, description, free, premium }: FeatureCardPro
           </span>
         )}
       </div>
-      <h4 className="font-bold text-xl mb-3 text-gray-900 group-hover:text-primary-600 transition-colors">{title}</h4>
-      <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
+      <h4 className="font-bold text-xl mb-3 text-gray-700 group-hover:text-primary-600 transition-colors">{title}</h4>
+      <p className="text-gray-700 text-sm leading-relaxed">{description}</p>
     </div>
   )
 }
@@ -445,7 +452,7 @@ function TestimonialCard({ name, location, rating, text }: TestimonialCardProps)
       <p className="text-gray-700 mb-4 leading-relaxed italic">"{text}"</p>
       <div className="border-t border-gray-100 pt-4">
         <p className="font-semibold text-gray-900">{name}</p>
-        <p className="text-sm text-gray-600">{location}</p>
+        <p className="text-sm text-gray-700">{location}</p>
       </div>
     </div>
   )
@@ -465,13 +472,13 @@ function FAQItem({ question, answer }: FAQItemProps) {
         onClick={() => setIsOpen(!isOpen)}
         className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
       >
-        <span className="font-semibold text-gray-900">{question}</span>
-        <span className={`text-gray-600 transition-transform ${isOpen ? 'rotate-180' : ''}`}>
+        <span className="font-semibold text-gray-700">{question}</span>
+        <span className={`text-gray-700 transition-transform ${isOpen ? 'rotate-180' : ''}`}>
           ▼
         </span>
       </button>
       {isOpen && (
-        <div className="px-6 pb-4 text-gray-600 leading-relaxed">
+        <div className="px-6 pb-4 text-gray-700 leading-relaxed">
           {answer}
         </div>
       )}

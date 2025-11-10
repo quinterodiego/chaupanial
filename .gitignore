@@ -35,3 +35,10 @@ yarn-error.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Credentials
+credentials/
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json

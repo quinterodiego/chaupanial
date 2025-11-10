@@ -27,13 +27,13 @@ export function Header() {
           onClick={() => router.push('/')}
         >
           <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-[#A8D8EA] to-[#FFB3BA] text-gray-800 shadow-lg group-hover:shadow-xl transition-shadow">
-            <Baby size={24} className="text-gray-700" />
+            <Baby size={24} className="text-gray-600" />
           </div>
           <div className="flex flex-col">
             <h1 className="text-xl font-bold bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] bg-clip-text text-transparent">
               Chau Pañal
             </h1>
-            <p className="text-xs text-gray-500 hidden sm:block">Tu compañero en el control de esfínteres</p>
+            <p className="text-xs text-gray-600 hidden sm:block">Tu compañero en el control de esfínteres</p>
           </div>
         </div>
         
@@ -86,8 +86,8 @@ export function Header() {
             </>
           ) : (
             <Button 
-              onClick={() => signIn('google')}
-              className="bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] hover:from-[#98C8DA] hover:to-[#EFA3AA] text-gray-800 shadow-md hover:shadow-lg transition-all"
+              onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
+              className="bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] hover:from-[#98C8DA] hover:to-[#EFA3AA] text-gray-600 shadow-md hover:shadow-lg transition-all"
             >
               <User size={18} className="mr-2" />
               <span className="hidden sm:inline">Iniciar Sesión</span>

@@ -24,28 +24,49 @@ export const authOptions: NextAuthOptions = {
       return session
     },
     async signIn({ user, account, profile }) {
-      // Guardar el usuario en Google Sheets
+      // Guardar o actualizar el usuario en Google Sheets
       if (account?.provider === 'google' && user.email) {
         try {
           // Verificar si el usuario ya existe
-          const isPremium = await GoogleSheetsService.checkPremiumStatus(user.email)
+          const existingUser = await GoogleSheetsService.getUserByEmail(user.email)
           
-          // Si no existe, guardarlo (checkPremiumStatus retorna false si no existe)
-          // Por ahora guardamos siempre, luego optimizamos para no duplicar
-          await GoogleSheetsService.saveUser({
-            email: user.email,
-            name: user.name || 'Usuario',
-            image: user.image || undefined,
-            isPremium: isPremium,
-          })
+          if (existingUser.exists) {
+            // Usuario existe: actualizar información si cambió
+            await GoogleSheetsService.updateUser({
+              email: user.email,
+              name: user.name || existingUser.name,
+              image: user.image || existingUser.image,
+              // No actualizar isPremium aquí, se mantiene el valor existente
+            })
+          } else {
+            // Usuario nuevo: guardarlo
+            await GoogleSheetsService.saveUser({
+              email: user.email,
+              name: user.name || 'Usuario',
+              image: user.image || undefined,
+              isPremium: false, // Nuevo usuario empieza como gratuito
+            })
+          }
           
           return true
         } catch (error) {
-          console.error('Error guardando usuario:', error)
+          console.error('Error guardando/actualizando usuario:', error)
           return true // Permitir acceso aunque falle el guardado
         }
       }
       return true
+    },
+    async redirect({ url, baseUrl }) {
+      // Si el usuario viene de un login exitoso, redirigir al dashboard
+      if (url === baseUrl || url === `${baseUrl}/` || url.startsWith(`${baseUrl}/api/auth`)) {
+        return `${baseUrl}/dashboard`
+      }
+      // Si hay una URL específica, usarla
+      if (url.startsWith(baseUrl)) {
+        return url
+      }
+      // Por defecto, redirigir al dashboard
+      return `${baseUrl}/dashboard`
     },
   },
   pages: {
