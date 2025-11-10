@@ -35,7 +35,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
         <meta name="theme-color" content="#A8D8EA" />
       </head>
-      <body className={`${inter.className} app-container`}>
+      <body className={`${inter.className} app-container`} suppressHydrationWarning>
         <AuthProvider>
           <div className="safe-area">
             {children}

@@ -21,23 +21,23 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
-      <div className="container flex h-16 items-center justify-between px-4">
+      <div className="container flex h-16 items-center justify-between px-3 sm:px-4">
         <div 
-          className="flex items-center space-x-3 cursor-pointer group"
+          className="flex items-center space-x-2 sm:space-x-3 cursor-pointer group flex-shrink-0"
           onClick={() => router.push('/')}
         >
-          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-[#A8D8EA] to-[#FFB3BA] text-gray-800 shadow-lg group-hover:shadow-xl transition-shadow">
-            <Baby size={24} className="text-gray-600" />
+          <div className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#A8D8EA] to-[#FFB3BA] text-gray-800 shadow-lg group-hover:shadow-xl transition-shadow">
+            <Baby size={20} className="sm:w-6 sm:h-6 text-gray-600" />
           </div>
           <div className="flex flex-col">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] bg-clip-text text-transparent">
+            <h1 className="text-base sm:text-xl font-bold bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] bg-clip-text text-transparent">
               Chau Pañal
             </h1>
             <p className="text-xs text-gray-600 hidden sm:block">Tu compañero en el control de esfínteres</p>
           </div>
         </div>
         
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-1 sm:space-x-2">
           {session ? (
             <>
               {!session.user?.isPremium && (
@@ -45,22 +45,22 @@ export function Header() {
                   variant="outline"
                   size="sm"
                   onClick={() => router.push('/premium')}
-                  className="hidden sm:flex items-center gap-2 border-yellow-300 text-yellow-700 hover:bg-yellow-50"
+                  className="hidden sm:flex items-center gap-2 border-yellow-300 text-yellow-700 hover:bg-yellow-50 px-2 sm:px-3"
                 >
-                  <Crown size={16} className="text-yellow-600" />
-                  <span>Premium</span>
+                  <Crown size={14} className="text-yellow-600" />
+                  <span className="text-xs sm:text-sm">Premium</span>
                 </Button>
               )}
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 sm:space-x-2">
+                <div className="flex items-center space-x-1 sm:space-x-2">
                   {session.user?.image && (
                     <img 
                       src={session.user.image} 
                       alt="Profile" 
-                      className="w-9 h-9 rounded-full ring-2 ring-primary-200 hover:ring-primary-400 transition-all"
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full ring-2 ring-primary-200 hover:ring-primary-400 transition-all"
                     />
                   )}
-                  <span className="hidden md:block text-sm font-medium text-gray-700">
+                  <span className="hidden lg:block text-xs sm:text-sm font-medium text-gray-700">
                     ¡Hola, {session.user?.name?.split(' ')[0]}!
                   </span>
                 </div>
@@ -69,37 +69,38 @@ export function Header() {
                   variant="ghost" 
                   size="sm"
                   onClick={() => router.push('/dashboard')}
-                  className="text-gray-700 hover:bg-gray-100"
+                  className="text-gray-700 hover:bg-gray-100 px-2 sm:px-3"
                 >
-                  Dashboard
+                  <span className="hidden sm:inline text-xs sm:text-sm">Dashboard</span>
+                  <span className="sm:hidden text-xs">Dash</span>
                 </Button>
                 
                 <Button 
                   variant="ghost" 
                   size="sm"
                   onClick={() => router.push('/community')}
-                  className="text-gray-700 hover:bg-gray-100"
+                  className="text-gray-700 hover:bg-gray-100 px-2 sm:px-3"
                 >
-                  <MessageCircle size={18} className="mr-2" />
-                  <span className="hidden sm:inline">Comunidad</span>
+                  <MessageCircle size={16} className="sm:mr-2 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline text-xs sm:text-sm">Comunidad</span>
                 </Button>
                 
                 <Button 
                   variant="ghost" 
                   size="sm"
                   onClick={() => signOut()}
-                  className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 px-2 sm:px-3"
                 >
-                  <LogOut size={18} />
+                  <LogOut size={16} className="sm:w-4 sm:h-4" />
                 </Button>
               </div>
             </>
           ) : (
             <Button 
               onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
-              className="bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] hover:from-[#98C8DA] hover:to-[#EFA3AA] text-gray-600 shadow-md hover:shadow-lg transition-all"
+              className="bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] hover:from-[#98C8DA] hover:to-[#EFA3AA] text-gray-600 shadow-md hover:shadow-lg transition-all px-3 sm:px-4 text-xs sm:text-sm"
             >
-              <User size={18} className="mr-2" />
+              <User size={16} className="mr-1 sm:mr-2 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">Iniciar Sesión</span>
               <span className="sm:hidden">Entrar</span>
             </Button>

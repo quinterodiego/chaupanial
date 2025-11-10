@@ -260,7 +260,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       <Header />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {/* Banner de límite alcanzado */}
         {isAtLimit && (
           <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded">
@@ -304,19 +304,19 @@ export default function Dashboard() {
         )}
 
         {/* Header del Dashboard */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 sm:mb-8">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 whitespace-nowrap">
               Control de Esfínteres
             </h1>
-            <p className="text-gray-600">
+            <p className="text-sm sm:text-base text-gray-600">
               {isPremium ? (
                 <span className="flex items-center">
-                  <Crown className="mr-2 text-yellow-500" size={16} />
-                  Cuenta Premium
+                  <Crown className="mr-2 text-yellow-500 flex-shrink-0" size={14} />
+                  <span className="truncate">Cuenta Premium</span>
                 </span>
               ) : (
-                <span>Versión Gratuita • {monthlyCount}/{FREE_LIMIT_MONTHLY} registros este mes</span>
+                <span className="text-xs sm:text-sm">Versión Gratuita • {monthlyCount}/{FREE_LIMIT_MONTHLY} registros este mes</span>
               )}
             </p>
           </div>
@@ -324,30 +324,32 @@ export default function Dashboard() {
             onClick={() => router.push('/dashboard/registro')}
             disabled={isAtLimit}
             size="lg"
+            className="w-full sm:w-auto flex-shrink-0 text-sm sm:text-base px-4 sm:px-6"
           >
-            <Plus className="mr-2" size={20} />
-            Registrar Esfínteres
+            <Plus className="mr-2" size={18} />
+            <span className="hidden sm:inline">Registrar Esfínteres</span>
+            <span className="sm:hidden">Registrar</span>
           </Button>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.1 }}
             whileHover={{ scale: 1.05, y: -5 }}
-            className="bg-white rounded-2xl p-6 shadow-lg"
+            className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg"
           >
-            <div className="flex items-center justify-between mb-4">
-              <Droplet className="text-blue-500" size={24} />
-              <span className="text-2xl font-bold text-gray-800">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <Droplet className="text-blue-500 flex-shrink-0" size={20} />
+              <span className="text-xl sm:text-2xl font-bold text-gray-800">
                 {visibleActivities.filter(a => a.details?.type === 'pipi' || a.details?.type === 'húmedo').length}
               </span>
             </div>
-            <p className="text-gray-600">Registros de pis</p>
+            <p className="text-sm sm:text-base text-gray-600">Registros de pis</p>
             {!isPremium && (
-              <p className="text-xs text-gray-400 mt-2">Últimos {FREE_LIMIT_DAYS} días</p>
+              <p className="text-xs text-gray-400 mt-1 sm:mt-2">Últimos {FREE_LIMIT_DAYS} días</p>
             )}
           </motion.div>
 
@@ -356,17 +358,17 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.2 }}
             whileHover={{ scale: 1.05, y: -5 }}
-            className="bg-white rounded-2xl p-6 shadow-lg"
+            className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg"
           >
-            <div className="flex items-center justify-between mb-4">
-              <TrendingUp className="text-purple-500" size={24} />
-              <span className="text-2xl font-bold text-gray-800">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <TrendingUp className="text-purple-500 flex-shrink-0" size={20} />
+              <span className="text-xl sm:text-2xl font-bold text-gray-800">
                 {visibleActivities.filter(a => a.details?.type === 'caca' || a.details?.type === 'sucio').length}
               </span>
             </div>
-            <p className="text-gray-600">Registros de caca</p>
+            <p className="text-sm sm:text-base text-gray-600">Registros de caca</p>
             {!isPremium && (
-              <p className="text-xs text-gray-400 mt-2">Últimos {FREE_LIMIT_DAYS} días</p>
+              <p className="text-xs text-gray-400 mt-1 sm:mt-2">Últimos {FREE_LIMIT_DAYS} días</p>
             )}
           </motion.div>
 
@@ -375,17 +377,17 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.3 }}
             whileHover={{ scale: 1.05, y: -5 }}
-            className="bg-white rounded-2xl p-6 shadow-lg"
+            className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg"
           >
-            <div className="flex items-center justify-between mb-4">
-              <Calendar className="text-green-500" size={24} />
-              <span className="text-2xl font-bold text-gray-800">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <Calendar className="text-green-500 flex-shrink-0" size={20} />
+              <span className="text-xl sm:text-2xl font-bold text-gray-800">
                 {visibleActivities.length}
               </span>
             </div>
-            <p className="text-gray-600">Total registros</p>
+            <p className="text-sm sm:text-base text-gray-600">Total registros</p>
             {!isPremium && (
-              <p className="text-xs text-gray-400 mt-2">Últimos {FREE_LIMIT_DAYS} días</p>
+              <p className="text-xs text-gray-400 mt-1 sm:mt-2">Últimos {FREE_LIMIT_DAYS} días</p>
             )}
           </motion.div>
         </div>
@@ -396,66 +398,60 @@ export default function Dashboard() {
             <Zap className="text-yellow-500" size={20} />
             <h2 className="text-xl font-bold text-gray-800">Registro Rápido</h2>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4">
             <Button
               onClick={() => handleQuickAdd('pipi')}
               disabled={isAtLimit}
-              className="h-24 bg-blue-100 hover:bg-blue-200 text-blue-700 border-2 border-blue-300"
+              className="h-20 sm:h-24 bg-blue-100 hover:bg-blue-200 text-blue-700 border-2 border-blue-300 flex flex-col items-center justify-center p-2 sm:p-4"
             >
-              <Droplet className="mr-2" size={24} />
-              <div className="text-left">
-                <p className="font-bold text-lg">Pis</p>
-                <p className="text-xs">Registro rápido</p>
-              </div>
+              <Droplet className="mb-1 sm:mb-2 flex-shrink-0" size={20} />
+              <p className="font-bold text-sm sm:text-lg">Pis</p>
+              <p className="text-xs hidden sm:block">Registro rápido</p>
             </Button>
             <Button
               onClick={() => handleQuickAdd('caca')}
               disabled={isAtLimit}
-              className="h-24 bg-purple-100 hover:bg-purple-200 text-purple-700 border-2 border-purple-300"
+              className="h-20 sm:h-24 bg-purple-100 hover:bg-purple-200 text-purple-700 border-2 border-purple-300 flex flex-col items-center justify-center p-2 sm:p-4"
             >
-              <Droplet className="mr-2" size={24} />
-              <div className="text-left">
-                <p className="font-bold text-lg">Caca</p>
-                <p className="text-xs">Registro rápido</p>
-              </div>
+              <Droplet className="mb-1 sm:mb-2 flex-shrink-0" size={20} />
+              <p className="font-bold text-sm sm:text-lg">Caca</p>
+              <p className="text-xs hidden sm:block">Registro rápido</p>
             </Button>
             <Button
               onClick={() => handleQuickAdd('seco')}
               disabled={isAtLimit}
-              className="h-24 bg-green-100 hover:bg-green-200 text-green-700 border-2 border-green-300"
+              className="h-20 sm:h-24 bg-green-100 hover:bg-green-200 text-green-700 border-2 border-green-300 flex flex-col items-center justify-center p-2 sm:p-4"
             >
-              <Droplet className="mr-2" size={24} />
-              <div className="text-left">
-                <p className="font-bold text-lg">Seco</p>
-                <p className="text-xs">Registro rápido</p>
-              </div>
+              <Droplet className="mb-1 sm:mb-2 flex-shrink-0" size={20} />
+              <p className="font-bold text-sm sm:text-lg">Seco</p>
+              <p className="text-xs hidden sm:block">Registro rápido</p>
             </Button>
           </div>
         </div>
 
         {/* Resumen del Día */}
-        <div className="bg-white rounded-2xl p-6 shadow-lg mb-8">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Resumen de Hoy</h2>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4">Resumen de Hoy</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
             <div className="text-center">
-              <p className="text-3xl font-bold text-blue-600">{todayStats.pis}</p>
-              <p className="text-sm text-gray-600">Pis</p>
+              <p className="text-2xl sm:text-3xl font-bold text-blue-600">{todayStats.pis}</p>
+              <p className="text-xs sm:text-sm text-gray-600">Pis</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold text-purple-600">{todayStats.caca}</p>
-              <p className="text-sm text-gray-600">Caca</p>
+              <p className="text-2xl sm:text-3xl font-bold text-purple-600">{todayStats.caca}</p>
+              <p className="text-xs sm:text-sm text-gray-600">Caca</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold text-indigo-600">{todayStats.pipiCaca}</p>
-              <p className="text-sm text-gray-600">Pis y Caca</p>
+              <p className="text-2xl sm:text-3xl font-bold text-indigo-600">{todayStats.pipiCaca}</p>
+              <p className="text-xs sm:text-sm text-gray-600">Pis y Caca</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold text-green-600">{todayStats.seco}</p>
-              <p className="text-sm text-gray-600">Seco</p>
+              <p className="text-2xl sm:text-3xl font-bold text-green-600">{todayStats.seco}</p>
+              <p className="text-xs sm:text-sm text-gray-600">Seco</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold text-gray-800">{todayStats.total}</p>
-              <p className="text-sm text-gray-600">Total</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-800">{todayStats.total}</p>
+              <p className="text-xs sm:text-sm text-gray-600">Total</p>
             </div>
           </div>
         </div>

@@ -12,8 +12,10 @@ export function Toaster() {
     variant?: 'default' | 'success' | 'error' | 'warning'
     open: boolean
   }>>([])
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
     // Escuchar eventos de toast desde window
     const handleToast = (event: CustomEvent) => {
       const { title, description, variant = 'default' } = event.detail
@@ -21,11 +23,17 @@ export function Toaster() {
       setToasts((prev) => [...prev, { id, title, description, variant, open: true }])
     }
 
-    window.addEventListener('toast' as any, handleToast as EventListener)
-    return () => {
-      window.removeEventListener('toast' as any, handleToast as EventListener)
+    if (typeof window !== 'undefined') {
+      window.addEventListener('toast' as any, handleToast as EventListener)
+      return () => {
+        window.removeEventListener('toast' as any, handleToast as EventListener)
+      }
     }
   }, [])
+
+  if (!mounted) {
+    return null
+  }
 
   return (
     <Toast.Provider swipeDirection="right" duration={5000}>

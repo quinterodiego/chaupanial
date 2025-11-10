@@ -153,15 +153,16 @@ export default function PostPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       <Header />
       
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
+      <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-4xl">
         {/* Botón Volver */}
         <Button
           onClick={() => router.push(`/community/${post.forumId}`)}
           variant="ghost"
-          className="mb-6"
+          className="mb-4 sm:mb-6 px-2 sm:px-3"
         >
-          <ArrowLeft className="mr-2" size={16} />
-          Volver al Foro
+          <ArrowLeft className="sm:mr-2" size={16} />
+          <span className="hidden sm:inline">Volver al Foro</span>
+          <span className="sm:hidden">Volver</span>
         </Button>
 
         {/* Post Principal */}
@@ -219,20 +220,20 @@ export default function PostPage() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6"
+            className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6"
           >
-            <div className="flex items-start gap-3">
-              <AlertCircle className="text-blue-600 flex-shrink-0 mt-1" size={20} />
-              <div className="flex-1">
-                <p className="text-sm text-blue-800">
+            <div className="flex items-start gap-2 sm:gap-3">
+              <AlertCircle className="text-blue-600 flex-shrink-0 mt-0.5 sm:mt-1" size={18} />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs sm:text-sm text-blue-800">
                   <strong>Versión Gratuita:</strong> Has usado {todayCommentCount} de 3 comentarios hoy.
                   {todayCommentCount >= 3 && (
                     <Button
                       onClick={() => router.push('/premium')}
                       variant="link"
-                      className="ml-2 text-blue-600 underline p-0 h-auto"
+                      className="ml-1 sm:ml-2 text-blue-600 underline p-0 h-auto text-xs sm:text-sm"
                     >
-                      Actualiza a Premium para comentarios ilimitados
+                      Actualiza a Premium
                     </Button>
                   )}
                 </p>
@@ -246,15 +247,15 @@ export default function PostPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl p-6 shadow-lg mb-6"
+          className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg mb-4 sm:mb-6"
         >
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Escribe un comentario</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4">Escribe un comentario</h2>
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-              <p className="text-sm text-red-700">{error}</p>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-2.5 sm:p-3 mb-3 sm:mb-4">
+              <p className="text-xs sm:text-sm text-red-700">{error}</p>
             </div>
           )}
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <textarea
               value={newComment}
               onChange={(e) => {
@@ -264,19 +265,19 @@ export default function PostPage() {
               placeholder="Escribe tu comentario aquí..."
               rows={4}
               disabled={!isPremium && todayCommentCount >= 3}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+              className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed text-sm sm:text-base"
               maxLength={500}
             />
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
               <p className="text-xs text-gray-500">
                 {newComment.length}/500 caracteres
               </p>
               <Button
                 onClick={handleCreateComment}
                 disabled={isSubmitting || !newComment.trim() || (!isPremium && todayCommentCount >= 3)}
-                className="bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] hover:from-[#98C8DA] hover:to-[#EFA3AA] text-white"
+                className="bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] hover:from-[#98C8DA] hover:to-[#EFA3AA] text-white w-full sm:w-auto text-sm sm:text-base"
               >
-                <Send className="mr-2" size={16} />
+                <Send className="mr-2" size={14} />
                 {isSubmitting ? 'Enviando...' : 'Comentar'}
               </Button>
             </div>
@@ -284,38 +285,38 @@ export default function PostPage() {
         </motion.div>
 
         {/* Lista de Comentarios */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">
+        <div className="space-y-3 sm:space-y-4">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4">
             Comentarios ({comments.length})
           </h2>
           {comments.length === 0 ? (
-            <div className="text-center py-12 bg-white rounded-2xl shadow-lg">
-              <MessageCircle className="mx-auto text-gray-300 mb-4" size={48} />
-              <p className="text-gray-600">No hay comentarios aún</p>
-              <p className="text-sm text-gray-500 mt-2">Sé el primero en comentar</p>
+            <div className="text-center py-8 sm:py-12 bg-white rounded-xl sm:rounded-2xl shadow-lg">
+              <MessageCircle className="mx-auto text-gray-300 mb-3 sm:mb-4" size={40} />
+              <p className="text-sm sm:text-base text-gray-600">No hay comentarios aún</p>
+              <p className="text-xs sm:text-sm text-gray-500 mt-2">Sé el primero en comentar</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {comments.map((comment, index) => (
                 <motion.div
                   key={comment.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
-                  className="bg-white rounded-2xl p-6 shadow-lg"
+                  className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg"
                 >
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center flex-shrink-0">
+                  <div className="flex items-start gap-3 sm:gap-4">
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center flex-shrink-0">
                       {comment.userImage ? (
-                        <img src={comment.userImage} alt={comment.userName} className="w-10 h-10 rounded-full" />
+                        <img src={comment.userImage} alt={comment.userName} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full" />
                       ) : (
-                        <User className="text-gray-600" size={20} />
+                        <User className="text-gray-600" size={18} />
                       )}
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="font-semibold text-gray-800">{comment.userName}</span>
-                        <span className="text-xs text-gray-500">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-1 sm:mb-2">
+                        <span className="font-semibold text-gray-800 text-sm sm:text-base">{comment.userName}</span>
+                        <span className="text-xs text-gray-500 whitespace-nowrap">
                           {new Date(comment.timestamp).toLocaleDateString('es', {
                             day: 'numeric',
                             month: 'short',
@@ -325,7 +326,7 @@ export default function PostPage() {
                           })}
                         </span>
                       </div>
-                      <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                      <p className="text-sm sm:text-base text-gray-700 whitespace-pre-wrap leading-relaxed">
                         {comment.content}
                       </p>
                     </div>
