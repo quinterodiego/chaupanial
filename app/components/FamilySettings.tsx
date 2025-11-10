@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from './ui/button'
-import { UserPlus, Edit2, Users, Crown, X } from 'lucide-react'
+import { UserPlus, Edit2, Users, Crown, X, ChevronDown, ChevronUp } from 'lucide-react'
 
 interface FamilyInfo {
   babyName: string
@@ -23,6 +23,7 @@ export function FamilySettings({ isPremium }: FamilySettingsProps) {
   const [isInviting, setIsInviting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [isExpanded, setIsExpanded] = useState(false)
 
   useEffect(() => {
     if (isPremium) {
@@ -164,138 +165,163 @@ export function FamilySettings({ isPremium }: FamilySettingsProps) {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-2xl p-6 shadow-lg mb-8">
-        <p className="text-gray-600">Cargando...</p>
+      <div className="bg-white rounded-2xl shadow-lg mb-8 overflow-hidden">
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <Users className="text-purple-500" size={20} />
+            <h2 className="text-xl font-bold text-gray-800">Gestión de Familia</h2>
+            <Crown className="text-yellow-500 ml-2" size={16} />
+          </div>
+          {isExpanded ? <ChevronUp size={20} className="text-gray-400" /> : <ChevronDown size={20} className="text-gray-400" />}
+        </button>
+        {isExpanded && (
+          <div className="px-6 pb-6">
+            <p className="text-gray-600">Cargando...</p>
+          </div>
+        )}
       </div>
     )
   }
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-lg mb-8">
-      <div className="flex items-center gap-2 mb-6">
-        <Users className="text-purple-500" size={20} />
-        <h2 className="text-xl font-bold text-gray-800">Gestión de Familia</h2>
-        <Crown className="text-yellow-500 ml-auto" size={16} />
-      </div>
-
-      {/* Nombre del Niño */}
-      <div className="mb-6 pb-6 border-b border-gray-200">
-        <div className="flex items-center justify-between mb-3">
-          <label className="text-sm font-medium text-gray-700">Nombre del Niño/a</label>
-          {!isEditingName && (
-            <Button
-              onClick={() => setIsEditingName(true)}
-              variant="ghost"
-              size="sm"
-            >
-              <Edit2 className="mr-2" size={14} />
-              Editar
-            </Button>
-          )}
+    <div className="bg-white rounded-2xl shadow-lg mb-8 overflow-hidden">
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <Users className="text-purple-500" size={20} />
+          <h2 className="text-xl font-bold text-gray-800">Gestión de Familia</h2>
+          <Crown className="text-yellow-500 ml-2" size={16} />
         </div>
-        
-        {isEditingName ? (
-          <div className="space-y-3">
-            <input
-              type="text"
-              value={babyName}
-              onChange={(e) => setBabyName(e.target.value)}
-              placeholder="Nombre del niño/a"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              maxLength={50}
-            />
-            <div className="flex gap-2">
-              <Button
-                onClick={handleUpdateBabyName}
-                className="bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] hover:from-[#98C8DA] hover:to-[#EFA3AA] text-white"
-              >
-                Guardar
-              </Button>
-              <Button
-                onClick={() => {
-                  setIsEditingName(false)
-                  setBabyName(familyInfo?.babyName || 'Bebé')
-                  setError(null)
-                }}
-                variant="outline"
-              >
-                Cancelar
-              </Button>
+        {isExpanded ? <ChevronUp size={20} className="text-gray-400" /> : <ChevronDown size={20} className="text-gray-400" />}
+      </button>
+      
+      {isExpanded && (
+        <div className="px-6 pb-6 space-y-6">
+          {/* Nombre del Niño */}
+          <div className="pb-6 border-b border-gray-200">
+            <div className="flex items-center justify-between mb-3">
+              <label className="text-sm font-medium text-gray-700">Nombre del Niño/a</label>
+              {!isEditingName && (
+                <Button
+                  onClick={() => setIsEditingName(true)}
+                  variant="ghost"
+                  size="sm"
+                >
+                  <Edit2 className="mr-2" size={14} />
+                  Editar
+                </Button>
+              )}
             </div>
-          </div>
-        ) : (
-          <p className="text-lg font-semibold text-gray-800">
-            {familyInfo?.babyName || 'Bebé'}
-          </p>
-        )}
-      </div>
-
-      {/* Invitar Usuario */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-3">
-          Invitar a tu Pareja
-        </label>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
-          <p className="text-sm text-blue-800">
-            <strong>📧 Importante:</strong> Tu pareja debe estar registrada en Chau Pañal con el mismo email que ingreses.
-          </p>
-          <p className="text-xs text-blue-600 mt-1">
-            Si aún no se registró, debe hacerlo primero desde la página principal con su cuenta de Google.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <input
-            type="email"
-            value={invitedEmail}
-            onChange={(e) => setInvitedEmail(e.target.value)}
-            placeholder="Email de tu pareja (ej: papa@gmail.com)"
-            className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-          />
-          <Button
-            onClick={handleInviteUser}
-            disabled={isInviting || !invitedEmail.trim()}
-            className="bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] hover:from-[#98C8DA] hover:to-[#EFA3AA] text-white"
-          >
-            <UserPlus className="mr-2" size={16} />
-            {isInviting ? 'Enviando...' : 'Invitar'}
-          </Button>
-        </div>
-        <p className="text-xs text-gray-500 mt-2">
-          Una vez invitado, tu pareja verá automáticamente los registros compartidos la próxima vez que inicie sesión.
-        </p>
-      </div>
-
-      {/* Usuarios Compartidos */}
-      {familyInfo && familyInfo.sharedUsers.length > 0 && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">
-            Miembros de la Familia
-          </label>
-          <div className="space-y-2">
-            {familyInfo.sharedUsers.map((email, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-              >
-                <div className="flex items-center gap-2">
-                  <Users className="text-gray-400" size={16} />
-                  <span className="text-sm text-gray-700">{email}</span>
+            
+            {isEditingName ? (
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  value={babyName}
+                  onChange={(e) => setBabyName(e.target.value)}
+                  placeholder="Nombre del niño/a"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  maxLength={50}
+                />
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleUpdateBabyName}
+                    className="bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] hover:from-[#98C8DA] hover:to-[#EFA3AA] text-white"
+                  >
+                    Guardar
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setIsEditingName(false)
+                      setBabyName(familyInfo?.babyName || 'Bebé')
+                      setError(null)
+                    }}
+                    variant="outline"
+                  >
+                    Cancelar
+                  </Button>
                 </div>
               </div>
-            ))}
+            ) : (
+              <p className="text-lg font-semibold text-gray-800">
+                {familyInfo?.babyName || 'Bebé'}
+              </p>
+            )}
           </div>
-        </div>
-      )}
 
-      {/* Mensajes de Error/Success */}
-      {error && (
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm text-red-700">{error}</p>
-        </div>
-      )}
-      {success && (
-        <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-sm text-green-700">{success}</p>
+          {/* Invitar Usuario */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Invitar a tu Pareja
+            </label>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+              <p className="text-sm text-blue-800">
+                <strong>📧 Importante:</strong> Tu pareja debe estar registrada en Chau Pañal con el mismo email que ingreses.
+              </p>
+              <p className="text-xs text-blue-600 mt-1">
+                Si aún no se registró, debe hacerlo primero desde la página principal con su cuenta de Google.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="email"
+                value={invitedEmail}
+                onChange={(e) => setInvitedEmail(e.target.value)}
+                placeholder="Email de tu pareja (ej: papa@gmail.com)"
+                className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              />
+              <Button
+                onClick={handleInviteUser}
+                disabled={isInviting || !invitedEmail.trim()}
+                className="bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] hover:from-[#98C8DA] hover:to-[#EFA3AA] text-white"
+              >
+                <UserPlus className="mr-2" size={16} />
+                {isInviting ? 'Enviando...' : 'Invitar'}
+              </Button>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              Una vez invitado, tu pareja verá automáticamente los registros compartidos la próxima vez que inicie sesión.
+            </p>
+          </div>
+
+          {/* Usuarios Compartidos */}
+          {familyInfo && familyInfo.sharedUsers.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Miembros de la Familia
+              </label>
+              <div className="space-y-2">
+                {familyInfo.sharedUsers.map((email, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Users className="text-gray-400" size={16} />
+                      <span className="text-sm text-gray-700">{email}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Mensajes de Error/Success */}
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+          )}
+          {success && (
+            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-sm text-green-700">{success}</p>
+            </div>
+          )}
         </div>
       )}
     </div>

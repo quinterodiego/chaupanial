@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#A8D8EA;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFB3BA;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Fondo con esquinas redondeadas (squircle) -->
+  <rect x="2" y="2" width="96" height="96" rx="20" ry="20" fill="url(#gradient)" stroke="#fff" stroke-width="1"/>
+  
+  <!-- Cabeza del bebé (contorno) -->
+  <ellipse cx="50" cy="50" rx="20" ry="22" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Rizo de pelo (parte superior izquierda) -->
+  <path d="M 35 35 Q 30 28 35 25 Q 40 22 45 28" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Ojos (puntos cuadrados) -->
+  <rect x="43" y="45" width="3" height="3" rx="0.5" fill="#333"/>
+  <rect x="54" y="45" width="3" height="3" rx="0.5" fill="#333"/>
+  
+  <!-- Sonrisa (línea curva hacia arriba) -->
+  <path d="M 42 55 Q 50 60 58 55" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+</svg>
