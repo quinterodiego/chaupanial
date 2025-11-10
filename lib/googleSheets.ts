@@ -324,6 +324,132 @@ export class GoogleSheetsService {
     }
   }
 
+  // Actualizar una actividad existente
+  static async updateActivity(data: {
+    userEmail: string
+    originalTimestamp: string // Timestamp original para identificar la actividad
+    babyName?: string
+    activityType?: 'feeding' | 'sleep' | 'diaper' | 'milestone' | 'esfinteres'
+    details?: any
+    timestamp?: Date // Nuevo timestamp si se cambia la fecha/hora
+  }) {
+    try {
+      // Obtener todas las actividades para encontrar la fila
+      const response = await sheets.spreadsheets.values.get({
+        spreadsheetId: SPREADSHEET_ID,
+        range: 'Actividades!A:E',
+      })
+
+      const rows = response.data.values
+      if (!rows || rows.length === 0) {
+        return { success: false, error: 'No se encontraron actividades' }
+      }
+
+      // Buscar la fila que coincide con el email y timestamp original
+      const rowIndex = rows.findIndex((row, index) => {
+        if (index === 0) return false // Saltar header
+        return row[1] === data.userEmail && row[0] === data.originalTimestamp
+      })
+
+      if (rowIndex === -1) {
+        return { success: false, error: 'Actividad no encontrada' }
+      }
+
+      // La fila en Sheets es rowIndex + 1 (porque las filas empiezan en 1)
+      const sheetRow = rowIndex + 1
+
+      // Preparar los valores actualizados
+      const originalRow = rows[rowIndex]
+      const newTimestamp = data.timestamp ? data.timestamp.toISOString() : originalRow[0]
+      const newBabyName = data.babyName !== undefined ? data.babyName : originalRow[2]
+      const newActivityType = data.activityType !== undefined ? data.activityType : originalRow[3]
+      const newDetails = data.details !== undefined ? JSON.stringify(data.details) : originalRow[4]
+
+      // Actualizar la fila completa
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: SPREADSHEET_ID,
+        range: `Actividades!A${sheetRow}:E${sheetRow}`,
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: [[newTimestamp, data.userEmail, newBabyName, newActivityType, newDetails]],
+        },
+      })
+
+      return { success: true }
+    } catch (error) {
+      console.error('Error actualizando actividad:', error)
+      return { success: false, error }
+    }
+  }
+
+  // Eliminar una actividad
+  static async deleteActivity(userEmail: string, timestamp: string) {
+    try {
+      // Obtener todas las actividades para encontrar la fila
+      const response = await sheets.spreadsheets.values.get({
+        spreadsheetId: SPREADSHEET_ID,
+        range: 'Actividades!A:E',
+      })
+
+      const rows = response.data.values
+      if (!rows || rows.length === 0) {
+        return { success: false, error: 'No se encontraron actividades' }
+      }
+
+      // Buscar la fila que coincide con el email y timestamp
+      const rowIndex = rows.findIndex((row, index) => {
+        if (index === 0) return false // Saltar header
+        return row[1] === userEmail && row[0] === timestamp
+      })
+
+      if (rowIndex === -1) {
+        return { success: false, error: 'Actividad no encontrada' }
+      }
+
+      // La fila en Sheets es rowIndex + 1 (porque las filas empiezan en 1)
+      const sheetRow = rowIndex + 1
+
+      // Obtener el sheetId de la hoja "Actividades"
+      const spreadsheet = await sheets.spreadsheets.get({
+        spreadsheetId: SPREADSHEET_ID,
+      })
+
+      const activitiesSheet = spreadsheet.data.sheets?.find(
+        sheet => sheet.properties?.title === 'Actividades'
+      )
+
+      if (!activitiesSheet?.properties?.sheetId) {
+        return { success: false, error: 'No se encontró la hoja Actividades' }
+      }
+
+      const sheetId = activitiesSheet.properties.sheetId
+
+      // Eliminar la fila usando batchUpdate
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: SPREADSHEET_ID,
+        requestBody: {
+          requests: [
+            {
+              deleteDimension: {
+                range: {
+                  sheetId: sheetId,
+                  dimension: 'ROWS',
+                  startIndex: sheetRow - 1, // El índice empieza en 0
+                  endIndex: sheetRow, // End index es exclusivo
+                },
+              },
+            },
+          ],
+        },
+      })
+
+      return { success: true }
+    } catch (error) {
+      console.error('Error eliminando actividad:', error)
+      return { success: false, error }
+    }
+  }
+
   // ========== FUNCIONES DE FAMILIA (PREMIUM) ==========
 
   // Obtener información de la familia (nombre del niño, usuarios compartidos)

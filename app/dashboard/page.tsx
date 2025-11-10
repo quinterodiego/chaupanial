@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Header } from '../components/Header'
 import { Button } from '../components/ui/button'
-import { Plus, Baby, Calendar, TrendingUp, Crown, AlertCircle, Droplet, X, Eye, Search, Zap, Trophy, Lightbulb, ChevronDown, ChevronUp } from 'lucide-react'
+import { Plus, Baby, Calendar, TrendingUp, Crown, AlertCircle, Droplet, X, Eye, Search, Zap, Trophy, Lightbulb, ChevronDown, ChevronUp, Edit, Trash2, Save, Clock } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { CalendarView } from '../components/CalendarView'
 import { ChartsView } from '../components/ChartsView'
@@ -30,6 +30,14 @@ export default function Dashboard() {
   const [showCalendar, setShowCalendar] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [quickFilter, setQuickFilter] = useState<'all' | 'today' | 'yesterday' | 'week'>('all')
+  const [isEditing, setIsEditing] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [editForm, setEditForm] = useState({
+    type: 'pipi',
+    notes: '',
+    date: '',
+    time: '',
+  })
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -54,6 +62,19 @@ export default function Dashboard() {
     window.addEventListener('focus', handleFocus)
     return () => window.removeEventListener('focus', handleFocus)
   }, [status, session])
+
+  // Inicializar formulario de edición cuando se selecciona una actividad
+  useEffect(() => {
+    if (selectedActivity && !isEditing) {
+      const activityDate = new Date(selectedActivity.timestamp)
+      setEditForm({
+        type: selectedActivity.details?.type || 'pipi',
+        notes: selectedActivity.details?.notes || '',
+        date: activityDate.toISOString().split('T')[0],
+        time: `${String(activityDate.getHours()).padStart(2, '0')}:${String(activityDate.getMinutes()).padStart(2, '0')}`,
+      })
+    }
+  }, [selectedActivity, isEditing])
 
   const loadActivities = async () => {
     try {
@@ -726,94 +747,307 @@ export default function Dashboard() {
       {selectedActivity && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-          onClick={() => setSelectedActivity(null)}
+          onClick={() => {
+            if (!isEditing && !isDeleting) {
+              setSelectedActivity(null)
+              setIsEditing(false)
+              setIsDeleting(false)
+            }
+          }}
         >
           <div 
-            className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl"
+            className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-gray-800">Detalles del Registro</h3>
+              <h3 className="text-2xl font-bold text-gray-800">
+                {isEditing ? 'Editar Registro' : isDeleting ? 'Eliminar Registro' : 'Detalles del Registro'}
+              </h3>
               <button
-                onClick={() => setSelectedActivity(null)}
+                onClick={() => {
+                  setSelectedActivity(null)
+                  setIsEditing(false)
+                  setIsDeleting(false)
+                }}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <X size={24} />
               </button>
             </div>
 
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
-                  (selectedActivity.details?.type === 'pipi' || selectedActivity.details?.type === 'húmedo') ? 'bg-blue-100 text-blue-600' :
-                  (selectedActivity.details?.type === 'caca' || selectedActivity.details?.type === 'sucio') ? 'bg-purple-100 text-purple-600' :
-                  selectedActivity.details?.type === 'pipi-caca' ? 'bg-indigo-100 text-indigo-600' :
-                  'bg-green-100 text-green-600'
-                }`}>
-                  <Droplet size={32} />
+            {isDeleting ? (
+              // Confirmación de eliminación
+              <div className="space-y-4">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <p className="text-red-800 font-semibold mb-2">¿Estás seguro de que quieres eliminar este registro?</p>
+                  <p className="text-sm text-red-700">
+                    Esta acción no se puede deshacer. El registro se eliminará permanentemente.
+                  </p>
                 </div>
-                <div>
-                  <p className="text-lg font-semibold text-gray-800">
-                    {selectedActivity.details?.type === 'pipi' && 'Pis'}
-                    {selectedActivity.details?.type === 'caca' && 'Caca'}
-                    {selectedActivity.details?.type === 'pipi-caca' && 'Pis y Caca'}
-                    {selectedActivity.details?.type === 'seco' && 'Seco'}
-                    {!selectedActivity.details?.type && 'Registro de Esfínteres'}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {new Date(selectedActivity.timestamp).toLocaleString('es', {
-                      weekday: 'long',
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </p>
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    onClick={() => setIsDeleting(false)}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={async () => {
+                      try {
+                        const timestamp = encodeURIComponent(selectedActivity.timestamp)
+                        const response = await fetch(`/api/activities/${timestamp}`, {
+                          method: 'DELETE',
+                        })
+
+                        const data = await response.json()
+
+                        if (!response.ok) {
+                          throw new Error(data.error || 'Error al eliminar')
+                        }
+
+                        // Recargar actividades
+                        await loadActivities()
+                        setSelectedActivity(null)
+                        setIsDeleting(false)
+                      } catch (error: any) {
+                        alert(error.message || 'Error al eliminar el registro')
+                      }
+                    }}
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    <Trash2 className="mr-2" size={16} />
+                    Eliminar
+                  </Button>
                 </div>
               </div>
-
-              {selectedActivity.details?.notes && (
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-sm font-medium text-gray-700 mb-2">Notas:</p>
-                  <p className="text-gray-600">{selectedActivity.details.notes}</p>
+            ) : isEditing ? (
+              // Formulario de edición
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Tipo de registro
+                  </label>
+                  <select
+                    value={editForm.type}
+                    onChange={(e) => setEditForm({ ...editForm, type: e.target.value })}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="pipi">Pis</option>
+                    <option value="caca">Caca</option>
+                    <option value="pipi-caca">Pis y Caca</option>
+                    <option value="seco">Seco (sin nada)</option>
+                  </select>
                 </div>
-              )}
 
-              <div className="border-t pt-4">
-                <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-gray-500 mb-1">Fecha</p>
-                    <p className="font-medium text-gray-800">
-                      {new Date(selectedActivity.timestamp).toLocaleDateString('es', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric'
-                      })}
-                    </p>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <Calendar className="inline mr-2" size={16} />
+                      Fecha
+                    </label>
+                    <input
+                      type="date"
+                      value={editForm.date}
+                      onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
+                      max={new Date().toISOString().split('T')[0]}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
                   </div>
                   <div>
-                    <p className="text-gray-500 mb-1">Hora</p>
-                    <p className="font-medium text-gray-800">
-                      {new Date(selectedActivity.timestamp).toLocaleTimeString('es', {
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <Clock className="inline mr-2" size={16} />
+                      Hora
+                    </label>
+                    <input
+                      type="time"
+                      value={editForm.time}
+                      onChange={(e) => setEditForm({ ...editForm, time: e.target.value })}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Notas (opcional)
+                  </label>
+                  <textarea
+                    value={editForm.notes}
+                    onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
+                    placeholder="Observaciones adicionales..."
+                    rows={3}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    onClick={() => {
+                      setIsEditing(false)
+                      // Restaurar valores originales
+                      const activityDate = new Date(selectedActivity.timestamp)
+                      setEditForm({
+                        type: selectedActivity.details?.type || 'pipi',
+                        notes: selectedActivity.details?.notes || '',
+                        date: activityDate.toISOString().split('T')[0],
+                        time: `${String(activityDate.getHours()).padStart(2, '0')}:${String(activityDate.getMinutes()).padStart(2, '0')}`,
+                      })
+                    }}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={async () => {
+                      try {
+                        // Combinar fecha y hora
+                        const [hours, minutes] = editForm.time.split(':')
+                        const newTimestamp = new Date(editForm.date)
+                        newTimestamp.setHours(parseInt(hours), parseInt(minutes), 0, 0)
+
+                        const timestamp = encodeURIComponent(selectedActivity.timestamp)
+                        const response = await fetch(`/api/activities/${timestamp}`, {
+                          method: 'PUT',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            type: 'esfinteres',
+                            details: {
+                              type: editForm.type,
+                              notes: editForm.notes,
+                            },
+                            timestamp: newTimestamp.toISOString(),
+                          }),
+                        })
+
+                        const data = await response.json()
+
+                        if (!response.ok) {
+                          throw new Error(data.error || 'Error al actualizar')
+                        }
+
+                        // Recargar actividades
+                        await loadActivities()
+                        setIsEditing(false)
+                        setSelectedActivity(null)
+                      } catch (error: any) {
+                        alert(error.message || 'Error al actualizar el registro')
+                      }
+                    }}
+                    className="flex-1 bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] hover:from-[#98C8DA] hover:to-[#EFA3AA] text-white"
+                  >
+                    <Save className="mr-2" size={16} />
+                    Guardar Cambios
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              // Vista de detalles
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
+                    (selectedActivity.details?.type === 'pipi' || selectedActivity.details?.type === 'húmedo') ? 'bg-blue-100 text-blue-600' :
+                    (selectedActivity.details?.type === 'caca' || selectedActivity.details?.type === 'sucio') ? 'bg-purple-100 text-purple-600' :
+                    selectedActivity.details?.type === 'pipi-caca' ? 'bg-indigo-100 text-indigo-600' :
+                    'bg-green-100 text-green-600'
+                  }`}>
+                    <Droplet size={32} />
+                  </div>
+                  <div>
+                    <p className="text-lg font-semibold text-gray-800">
+                      {selectedActivity.details?.type === 'pipi' && 'Pis'}
+                      {selectedActivity.details?.type === 'caca' && 'Caca'}
+                      {selectedActivity.details?.type === 'pipi-caca' && 'Pis y Caca'}
+                      {selectedActivity.details?.type === 'seco' && 'Seco'}
+                      {!selectedActivity.details?.type && 'Registro de Esfínteres'}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {new Date(selectedActivity.timestamp).toLocaleString('es', {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
                         hour: '2-digit',
                         minute: '2-digit'
                       })}
                     </p>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex gap-3 pt-4">
+                {selectedActivity.details?.notes && (
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Notas:</p>
+                    <p className="text-gray-600">{selectedActivity.details.notes}</p>
+                  </div>
+                )}
+
+                <div className="border-t pt-4">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-gray-500 mb-1">Fecha</p>
+                      <p className="font-medium text-gray-800">
+                        {new Date(selectedActivity.timestamp).toLocaleDateString('es', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 mb-1">Hora</p>
+                      <p className="font-medium text-gray-800">
+                        {new Date(selectedActivity.timestamp).toLocaleTimeString('es', {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    onClick={() => {
+                      const activityDate = new Date(selectedActivity.timestamp)
+                      setEditForm({
+                        type: selectedActivity.details?.type || 'pipi',
+                        notes: selectedActivity.details?.notes || '',
+                        date: activityDate.toISOString().split('T')[0],
+                        time: `${String(activityDate.getHours()).padStart(2, '0')}:${String(activityDate.getMinutes()).padStart(2, '0')}`,
+                      })
+                      setIsEditing(true)
+                    }}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    <Edit className="mr-2" size={16} />
+                    Editar
+                  </Button>
+                  <Button
+                    onClick={() => setIsDeleting(true)}
+                    variant="outline"
+                    className="flex-1 text-red-600 border-red-300 hover:bg-red-50"
+                  >
+                    <Trash2 className="mr-2" size={16} />
+                    Eliminar
+                  </Button>
+                </div>
                 <Button
-                  onClick={() => setSelectedActivity(null)}
-                  variant="outline"
-                  className="flex-1"
+                  onClick={() => {
+                    setSelectedActivity(null)
+                    setIsEditing(false)
+                    setIsDeleting(false)
+                  }}
+                  variant="ghost"
+                  className="w-full"
                 >
                   Cerrar
                 </Button>
               </div>
-            </div>
+            )}
           </div>
         </div>
       )}
