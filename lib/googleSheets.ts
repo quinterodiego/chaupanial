@@ -985,4 +985,411 @@ export class GoogleSheetsService {
       return { activities: [], monthlyCount: 0 }
     }
   }
+
+  // ========== FUNCIONES DE COMUNIDAD ==========
+
+  // Obtener todos los foros disponibles
+  static async getForums() {
+    try {
+      const response = await sheets.spreadsheets.values.get({
+        spreadsheetId: SPREADSHEET_ID,
+        range: 'Foros!A:E', // A=ID, B=Nombre, C=Descripcion, D=Icono, E=Categoria
+      })
+
+      const rows = response.data.values
+      if (!rows || rows.length === 0) {
+        // Si no hay foros, crear los foros por defecto
+        return await this.initializeDefaultForums()
+      }
+
+      // Saltar el header (fila 0)
+      const forums = rows.slice(1).map(row => ({
+        id: row[0],
+        name: row[1] || '',
+        description: row[2] || '',
+        icon: row[3] || '💬',
+        category: row[4] || 'general',
+      }))
+
+      return { forums }
+    } catch (error) {
+      console.error('Error obteniendo foros:', error)
+      // Si la hoja no existe, crear los foros por defecto
+      return await this.initializeDefaultForums()
+    }
+  }
+
+  // Inicializar foros por defecto
+  static async initializeDefaultForums() {
+    try {
+      // Verificar si la hoja Foros existe
+      try {
+        await sheets.spreadsheets.values.get({
+          spreadsheetId: SPREADSHEET_ID,
+          range: 'Foros!A1',
+        })
+      } catch (error) {
+        // La hoja no existe, crearla
+        const spreadsheet = await sheets.spreadsheets.get({
+          spreadsheetId: SPREADSHEET_ID,
+        })
+        
+        const existingSheets = spreadsheet.data.sheets?.map(s => s.properties?.title) || []
+        
+        if (!existingSheets.includes('Foros')) {
+          await sheets.spreadsheets.batchUpdate({
+            spreadsheetId: SPREADSHEET_ID,
+            requestBody: {
+              requests: [
+                {
+                  addSheet: {
+                    properties: {
+                      title: 'Foros',
+                    },
+                  },
+                },
+              ],
+            },
+          })
+          
+          await new Promise(resolve => setTimeout(resolve, 500))
+        }
+        
+        // Crear headers
+        await sheets.spreadsheets.values.update({
+          spreadsheetId: SPREADSHEET_ID,
+          range: 'Foros!A1:E1',
+          valueInputOption: 'RAW',
+          requestBody: {
+            values: [['ID', 'Nombre', 'Descripcion', 'Icono', 'Categoria']],
+          },
+        })
+      }
+
+      // Foros por defecto
+      const defaultForums = [
+        ['lactancia', 'Lactancia', 'Comparte experiencias y consejos sobre lactancia materna', '🍼', 'salud'],
+        ['alimentacion', 'Alimentación', 'Tips y recetas para la alimentación complementaria', '🥄', 'salud'],
+        ['sueño', 'Sueño', 'Consejos para ayudar a tu bebé a dormir mejor', '😴', 'desarrollo'],
+        ['desarrollo', 'Desarrollo', 'Hitos del desarrollo y estimulación temprana', '👶', 'desarrollo'],
+        ['salud', 'Salud General', 'Consultas sobre salud y bienestar del bebé', '🏥', 'salud'],
+      ]
+
+      // Agregar foros por defecto
+      await sheets.spreadsheets.values.append({
+        spreadsheetId: SPREADSHEET_ID,
+        range: 'Foros!A:E',
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: defaultForums,
+        },
+      })
+
+      return {
+        forums: defaultForums.map(row => ({
+          id: row[0],
+          name: row[1],
+          description: row[2],
+          icon: row[3],
+          category: row[4],
+        })),
+      }
+    } catch (error) {
+      console.error('Error inicializando foros:', error)
+      // Retornar foros por defecto en memoria si falla
+      return {
+        forums: [
+          { id: 'lactancia', name: 'Lactancia', description: 'Comparte experiencias sobre lactancia', icon: '🍼', category: 'salud' },
+          { id: 'alimentacion', name: 'Alimentación', description: 'Tips de alimentación complementaria', icon: '🥄', category: 'salud' },
+          { id: 'sueño', name: 'Sueño', description: 'Consejos para el sueño del bebé', icon: '😴', category: 'desarrollo' },
+          { id: 'desarrollo', name: 'Desarrollo', description: 'Hitos del desarrollo', icon: '👶', category: 'desarrollo' },
+          { id: 'salud', name: 'Salud General', description: 'Consultas sobre salud', icon: '🏥', category: 'salud' },
+        ],
+      }
+    }
+  }
+
+  // Obtener posts de un foro
+  static async getForumPosts(forumId: string, options?: { limit?: number }) {
+    try {
+      const response = await sheets.spreadsheets.values.get({
+        spreadsheetId: SPREADSHEET_ID,
+        range: 'Posts!A:G', // A=ID, B=ForoID, C=UserEmail, D=Titulo, E=Contenido, F=Timestamp, G=Likes
+      })
+
+      const rows = response.data.values
+      if (!rows || rows.length === 0) {
+        return { posts: [] }
+      }
+
+      // Filtrar posts del foro (saltando header)
+      const posts = rows
+        .slice(1)
+        .filter(row => row[1] === forumId)
+        .map(row => {
+          try {
+            const likes = row[6] ? parseInt(row[6]) || 0 : 0
+            return {
+              id: row[0],
+              forumId: row[1],
+              userEmail: row[2],
+              title: row[3] || '',
+              content: row[4] || '',
+              timestamp: row[5] || new Date().toISOString(),
+              likes: likes,
+            }
+          } catch (error) {
+            console.error('Error parseando post:', error)
+            return null
+          }
+        })
+        .filter(post => post !== null)
+        .sort((a, b) => {
+          // Ordenar por fecha descendente (más recientes primero)
+          return new Date(b!.timestamp).getTime() - new Date(a!.timestamp).getTime()
+        })
+
+      // Aplicar límite si se proporciona
+      const limitedPosts = options?.limit ? posts.slice(0, options.limit) : posts
+
+      return { posts: limitedPosts }
+    } catch (error) {
+      console.error('Error obteniendo posts:', error)
+      return { posts: [] }
+    }
+  }
+
+  // Crear un nuevo post (solo Premium)
+  static async createPost(data: {
+    forumId: string
+    userEmail: string
+    title: string
+    content: string
+  }) {
+    try {
+      // Verificar si la hoja Posts existe
+      try {
+        await sheets.spreadsheets.values.get({
+          spreadsheetId: SPREADSHEET_ID,
+          range: 'Posts!A1',
+        })
+      } catch (error) {
+        // Crear la hoja Posts
+        const spreadsheet = await sheets.spreadsheets.get({
+          spreadsheetId: SPREADSHEET_ID,
+        })
+        
+        const existingSheets = spreadsheet.data.sheets?.map(s => s.properties?.title) || []
+        
+        if (!existingSheets.includes('Posts')) {
+          await sheets.spreadsheets.batchUpdate({
+            spreadsheetId: SPREADSHEET_ID,
+            requestBody: {
+              requests: [
+                {
+                  addSheet: {
+                    properties: {
+                      title: 'Posts',
+                    },
+                  },
+                },
+              ],
+            },
+          })
+          
+          await new Promise(resolve => setTimeout(resolve, 500))
+        }
+        
+        // Crear headers
+        await sheets.spreadsheets.values.update({
+          spreadsheetId: SPREADSHEET_ID,
+          range: 'Posts!A1:G1',
+          valueInputOption: 'RAW',
+          requestBody: {
+            values: [['ID', 'ForoID', 'UserEmail', 'Titulo', 'Contenido', 'Timestamp', 'Likes']],
+          },
+        })
+      }
+
+      const postId = `post-${Date.now()}-${Math.random().toString(36).substring(7)}`
+      const timestamp = new Date().toISOString()
+
+      await sheets.spreadsheets.values.append({
+        spreadsheetId: SPREADSHEET_ID,
+        range: 'Posts!A:G',
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: [[postId, data.forumId, data.userEmail, data.title, data.content, timestamp, 0]],
+        },
+      })
+
+      return { success: true, postId }
+    } catch (error) {
+      console.error('Error creando post:', error)
+      return { success: false, error }
+    }
+  }
+
+  // Obtener comentarios de un post
+  static async getPostComments(postId: string) {
+    try {
+      const response = await sheets.spreadsheets.values.get({
+        spreadsheetId: SPREADSHEET_ID,
+        range: 'Comentarios!A:E', // A=ID, B=PostID, C=UserEmail, D=Contenido, E=Timestamp
+      })
+
+      const rows = response.data.values
+      if (!rows || rows.length === 0) {
+        return { comments: [] }
+      }
+
+      // Filtrar comentarios del post (saltando header)
+      const comments = rows
+        .slice(1)
+        .filter(row => row[1] === postId)
+        .map(row => ({
+          id: row[0],
+          postId: row[1],
+          userEmail: row[2],
+          content: row[3] || '',
+          timestamp: row[4] || new Date().toISOString(),
+        }))
+        .sort((a, b) => {
+          // Ordenar por fecha ascendente (más antiguos primero)
+          return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        })
+
+      return { comments }
+    } catch (error) {
+      console.error('Error obteniendo comentarios:', error)
+      return { comments: [] }
+    }
+  }
+
+  // Crear un comentario
+  static async createComment(data: {
+    postId: string
+    userEmail: string
+    content: string
+  }) {
+    try {
+      // Verificar si la hoja Comentarios existe
+      try {
+        await sheets.spreadsheets.values.get({
+          spreadsheetId: SPREADSHEET_ID,
+          range: 'Comentarios!A1',
+        })
+      } catch (error) {
+        // Crear la hoja Comentarios
+        const spreadsheet = await sheets.spreadsheets.get({
+          spreadsheetId: SPREADSHEET_ID,
+        })
+        
+        const existingSheets = spreadsheet.data.sheets?.map(s => s.properties?.title) || []
+        
+        if (!existingSheets.includes('Comentarios')) {
+          await sheets.spreadsheets.batchUpdate({
+            spreadsheetId: SPREADSHEET_ID,
+            requestBody: {
+              requests: [
+                {
+                  addSheet: {
+                    properties: {
+                      title: 'Comentarios',
+                    },
+                  },
+                },
+              ],
+            },
+          })
+          
+          await new Promise(resolve => setTimeout(resolve, 500))
+        }
+        
+        // Crear headers
+        await sheets.spreadsheets.values.update({
+          spreadsheetId: SPREADSHEET_ID,
+          range: 'Comentarios!A1:E1',
+          valueInputOption: 'RAW',
+          requestBody: {
+            values: [['ID', 'PostID', 'UserEmail', 'Contenido', 'Timestamp']],
+          },
+        })
+      }
+
+      const commentId = `comment-${Date.now()}-${Math.random().toString(36).substring(7)}`
+      const timestamp = new Date().toISOString()
+
+      await sheets.spreadsheets.values.append({
+        spreadsheetId: SPREADSHEET_ID,
+        range: 'Comentarios!A:E',
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: [[commentId, data.postId, data.userEmail, data.content, timestamp]],
+        },
+      })
+
+      return { success: true, commentId }
+    } catch (error) {
+      console.error('Error creando comentario:', error)
+      return { success: false, error }
+    }
+  }
+
+  // Contar comentarios del usuario en el día actual
+  static async getTodayCommentCount(userEmail: string): Promise<number> {
+    try {
+      const response = await sheets.spreadsheets.values.get({
+        spreadsheetId: SPREADSHEET_ID,
+        range: 'Comentarios!A:E', // A=ID, B=PostID, C=UserEmail, D=Contenido, E=Timestamp
+      })
+
+      const rows = response.data.values
+      if (!rows || rows.length === 0) {
+        return 0
+      }
+
+      const now = new Date()
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      today.setHours(0, 0, 0, 0)
+
+      const todayComments = rows
+        .slice(1) // Saltar header
+        .filter(row => {
+          if (row[2] !== userEmail) return false // C=UserEmail
+          
+          try {
+            const commentDate = new Date(row[4]) // E=Timestamp
+            commentDate.setHours(0, 0, 0, 0)
+            return commentDate.getTime() === today.getTime()
+          } catch (error) {
+            return false
+          }
+        })
+
+      return todayComments.length
+    } catch (error) {
+      console.error('Error contando comentarios:', error)
+      return 0
+    }
+  }
+
+  // Obtener información del usuario para mostrar en posts/comentarios
+  static async getUserInfoForCommunity(email: string) {
+    try {
+      const user = await this.getUserByEmail(email)
+      return {
+        name: user.name || email.split('@')[0],
+        image: user.image || '',
+        email: email,
+      }
+    } catch (error) {
+      console.error('Error obteniendo info de usuario:', error)
+      return {
+        name: email.split('@')[0],
+        image: '',
+        email: email,
+      }
+    }
+  }
 }

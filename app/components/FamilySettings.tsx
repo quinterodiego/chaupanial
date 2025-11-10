@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from './ui/button'
 import { UserPlus, Edit2, Users, Crown, X, ChevronDown, ChevronUp } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface FamilyMember {
   email: string
@@ -215,21 +216,41 @@ export function FamilySettings({ isPremium }: FamilySettingsProps) {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg mb-8 overflow-hidden">
-      <button
+    <motion.div 
+      className="bg-white rounded-2xl shadow-lg mb-8 overflow-hidden"
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <motion.button
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors"
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.99 }}
       >
         <div className="flex items-center gap-2">
           <Users className="text-purple-500" size={20} />
           <h2 className="text-xl font-bold text-gray-800">Gestión de Familia</h2>
           <Crown className="text-yellow-500 ml-2" size={16} />
         </div>
-        {isExpanded ? <ChevronUp size={20} className="text-gray-400" /> : <ChevronDown size={20} className="text-gray-400" />}
-      </button>
+        <motion.div
+          animate={{ rotate: isExpanded ? 180 : 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <ChevronDown size={20} className="text-gray-400" />
+        </motion.div>
+      </motion.button>
       
-      {isExpanded && (
-        <div className="px-6 pb-6 space-y-6">
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+            <div className="px-6 pb-6 space-y-6">
           {/* Nombre del Niño */}
           <div className="pb-6 border-b border-gray-200">
             <div className="flex items-center justify-between mb-3">
@@ -246,40 +267,59 @@ export function FamilySettings({ isPremium }: FamilySettingsProps) {
               )}
             </div>
             
-            {isEditingName ? (
-              <div className="space-y-3">
-                <input
-                  type="text"
-                  value={babyName}
-                  onChange={(e) => setBabyName(e.target.value)}
-                  placeholder="Nombre del niño/a"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  maxLength={50}
-                />
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleUpdateBabyName}
-                    className="bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] hover:from-[#98C8DA] hover:to-[#EFA3AA] text-white"
-                  >
-                    Guardar
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setIsEditingName(false)
-                      setBabyName(familyInfo?.babyName || 'Bebé')
-                      setError(null)
-                    }}
-                    variant="outline"
-                  >
-                    Cancelar
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <p className="text-lg font-semibold text-gray-800">
-                {familyInfo?.babyName || 'Bebé'}
-              </p>
-            )}
+            <AnimatePresence mode="wait">
+              {isEditingName ? (
+                <motion.div
+                  key="editing"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.2 }}
+                  className="space-y-3"
+                >
+                  <motion.input
+                    type="text"
+                    value={babyName}
+                    onChange={(e) => setBabyName(e.target.value)}
+                    placeholder="Nombre del niño/a"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    maxLength={50}
+                    initial={{ scale: 0.95 }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: 0.2 }}
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handleUpdateBabyName}
+                      className="bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] hover:from-[#98C8DA] hover:to-[#EFA3AA] text-white"
+                    >
+                      Guardar
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setIsEditingName(false)
+                        setBabyName(familyInfo?.babyName || 'Bebé')
+                        setError(null)
+                      }}
+                      variant="outline"
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.p
+                  key="display"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="text-lg font-semibold text-gray-800"
+                >
+                  {familyInfo?.babyName || 'Bebé'}
+                </motion.p>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Invitar Usuario */}
@@ -418,9 +458,13 @@ export function FamilySettings({ isPremium }: FamilySettingsProps) {
               </label>
               <div className="space-y-2">
                 {familyInfo.sharedUsers.map((member, index) => (
-                  <div
-                    key={index}
+                  <motion.div
+                    key={member.email}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
                     className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                    whileHover={{ scale: 1.02, backgroundColor: '#f9fafb' }}
                   >
                     <div className="flex items-center gap-2 flex-1">
                       <Users className="text-gray-400" size={16} />
@@ -501,26 +545,42 @@ export function FamilySettings({ isPremium }: FamilySettingsProps) {
                         Editar Rol
                       </Button>
                     )}
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
           )}
 
           {/* Mensajes de Error/Success */}
-          {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-700">{error}</p>
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                className="p-3 bg-red-50 border border-red-200 rounded-lg"
+              >
+                <p className="text-sm text-red-700">{error}</p>
+              </motion.div>
+            )}
+            {success && (
+              <motion.div
+                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                className="p-3 bg-green-50 border border-green-200 rounded-lg"
+              >
+                <p className="text-sm text-green-700">{success}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
             </div>
-          )}
-          {success && (
-            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-sm text-green-700">{success}</p>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   )
 }
 

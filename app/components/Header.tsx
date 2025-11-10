@@ -3,7 +3,7 @@
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Button } from './ui/button'
-import { User, LogOut, Crown, Baby } from 'lucide-react'
+import { User, LogOut, Crown, Baby, MessageCircle } from 'lucide-react'
 
 export function Header() {
   const { data: session, status } = useSession()
@@ -72,6 +72,16 @@ export function Header() {
                   className="text-gray-700 hover:bg-gray-100"
                 >
                   Dashboard
+                </Button>
+                
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => router.push('/community')}
+                  className="text-gray-700 hover:bg-gray-100"
+                >
+                  <MessageCircle size={18} className="mr-2" />
+                  <span className="hidden sm:inline">Comunidad</span>
                 </Button>
                 
                 <Button 

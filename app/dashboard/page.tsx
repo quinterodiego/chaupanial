@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 import { CalendarView } from '../components/CalendarView'
 import { ChartsView } from '../components/ChartsView'
 import { FamilySettings } from '../components/FamilySettings'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface Activity {
   id: string
@@ -331,7 +332,13 @@ export default function Dashboard() {
 
         {/* Stats Cards */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-2xl p-6 shadow-lg">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+            whileHover={{ scale: 1.05, y: -5 }}
+            className="bg-white rounded-2xl p-6 shadow-lg"
+          >
             <div className="flex items-center justify-between mb-4">
               <Droplet className="text-blue-500" size={24} />
               <span className="text-2xl font-bold text-gray-800">
@@ -342,9 +349,15 @@ export default function Dashboard() {
             {!isPremium && (
               <p className="text-xs text-gray-400 mt-2">Últimos {FREE_LIMIT_DAYS} días</p>
             )}
-          </div>
+          </motion.div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-lg">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+            whileHover={{ scale: 1.05, y: -5 }}
+            className="bg-white rounded-2xl p-6 shadow-lg"
+          >
             <div className="flex items-center justify-between mb-4">
               <TrendingUp className="text-purple-500" size={24} />
               <span className="text-2xl font-bold text-gray-800">
@@ -355,9 +368,15 @@ export default function Dashboard() {
             {!isPremium && (
               <p className="text-xs text-gray-400 mt-2">Últimos {FREE_LIMIT_DAYS} días</p>
             )}
-          </div>
+          </motion.div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-lg">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.3 }}
+            whileHover={{ scale: 1.05, y: -5 }}
+            className="bg-white rounded-2xl p-6 shadow-lg"
+          >
             <div className="flex items-center justify-between mb-4">
               <Calendar className="text-green-500" size={24} />
               <span className="text-2xl font-bold text-gray-800">
@@ -368,7 +387,7 @@ export default function Dashboard() {
             {!isPremium && (
               <p className="text-xs text-gray-400 mt-2">Últimos {FREE_LIMIT_DAYS} días</p>
             )}
-          </div>
+          </motion.div>
         </div>
 
         {/* Registro Rápido (Quick Add) */}
@@ -646,17 +665,22 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="space-y-3">
-              {visibleActivities.slice(0, 10).map((activity) => {
+              {visibleActivities.slice(0, 10).map((activity, index) => {
                 const type = activity.details?.type || 'seco'
                 const isPipi = type === 'pipi' || type === 'húmedo'
                 const isCaca = type === 'caca' || type === 'sucio'
                 const isSeco = type === 'seco'
                 
                 return (
-                  <div
+                  <motion.div
                     key={activity.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
                     onClick={() => setSelectedActivity(activity)}
                     className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                    whileHover={{ scale: 1.02, x: 5 }}
+                    whileTap={{ scale: 0.98 }}
                   >
                     <div className="flex items-center space-x-4 flex-1">
                       <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
@@ -692,7 +716,7 @@ export default function Dashboard() {
                       )}
                       <Eye className="text-gray-400 hover:text-gray-600 transition-colors" size={18} />
                     </div>
-                  </div>
+                  </motion.div>
                 )
               })}
             </div>
@@ -744,21 +768,30 @@ export default function Dashboard() {
       </main>
 
       {/* Modal de Detalles */}
-      {selectedActivity && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-          onClick={() => {
-            if (!isEditing && !isDeleting) {
-              setSelectedActivity(null)
-              setIsEditing(false)
-              setIsDeleting(false)
-            }
-          }}
-        >
-          <div 
-            className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
+      <AnimatePresence>
+        {selectedActivity && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+            onClick={() => {
+              if (!isEditing && !isDeleting) {
+                setSelectedActivity(null)
+                setIsEditing(false)
+                setIsDeleting(false)
+              }
+            }}
           >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ duration: 0.3, type: 'spring', stiffness: 300, damping: 30 }}
+              className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-gray-800">
                 {isEditing ? 'Editar Registro' : isDeleting ? 'Eliminar Registro' : 'Detalles del Registro'}
@@ -1048,9 +1081,10 @@ export default function Dashboard() {
                 </Button>
               </div>
             )}
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
