@@ -280,7 +280,11 @@ export function ChartsView({ activities }: ChartsViewProps) {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percent }: { name: string; percent: number }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                label={(entry: any) => {
+                  const percent = entry.percent || 0
+                  const name = entry.name || ''
+                  return `${name}: ${(percent * 100).toFixed(0)}%`
+                }}
                 outerRadius={80}
                 fill="#8884d8"
                 dataKey="value"
