@@ -1,9 +1,11 @@
 /** @type {import('next').NextConfig} */
+// Deshabilitar PWA durante el build en Vercel para evitar stack overflow
+// El PWA se generará en runtime si es necesario
 const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,
   skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development',
+  disable: process.env.NODE_ENV === 'development' || process.env.VERCEL === '1',
   buildExcludes: [/app-manifest\.json$/],
   exclude: [
     // Excluir archivos que causan problemas en build traces
@@ -23,14 +25,6 @@ const nextConfig = {
   // Deshabilitar build traces para evitar stack overflow
   experimental: {
     webpackBuildWorker: false,
-  },
-  // Usar output standalone para evitar problemas con build traces
-  output: 'standalone',
-  // Excluir node_modules del análisis de build traces para evitar stack overflow
-  outputFileTracingExcludes: {
-    '*': [
-      'node_modules/**/*',
-    ],
   },
   // Configuración de webpack para evitar problemas
   webpack: (config, { isServer }) => {
