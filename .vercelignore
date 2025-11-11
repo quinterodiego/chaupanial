@@ -1,0 +1,7 @@
+# Archivos a ignorar en Vercel
+node_modules
+.next
+public/sw.js
+public/workbox-*.js
+*.log
+

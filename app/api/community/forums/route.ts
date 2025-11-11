@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '../../auth/[...nextauth]/route'
 import { GoogleSheetsService } from '@/lib/googleSheets'
 
+export const dynamic = 'force-dynamic'
+
 // GET - Obtener todos los foros disponibles
 export async function GET(request: NextRequest) {
   try {

@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '../../auth/[...nextauth]/route'
 import { GoogleSheetsService } from '@/lib/googleSheets'
 
+export const dynamic = 'force-dynamic'
+
 // PUT - Actualizar una actividad
 export async function PUT(
   request: NextRequest,

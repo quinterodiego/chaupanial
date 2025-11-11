@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '../../auth/[...nextauth]/route'
 import { GoogleSheetsService } from '@/lib/googleSheets'
 
+export const dynamic = 'force-dynamic'
+
 // POST - Crear un comentario
 export async function POST(request: NextRequest) {
   try {
