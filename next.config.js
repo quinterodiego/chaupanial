@@ -1,11 +1,9 @@
 /** @type {import('next').NextConfig} */
-// Deshabilitar PWA durante el build en Vercel para evitar stack overflow
-// El PWA se generará en runtime si es necesario
 const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,
   skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development' || process.env.VERCEL === '1',
+  disable: process.env.NODE_ENV === 'development',
   buildExcludes: [/app-manifest\.json$/],
   exclude: [
     // Excluir archivos que causan problemas en build traces
