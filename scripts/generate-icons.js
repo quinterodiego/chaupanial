@@ -2,7 +2,7 @@ const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
 
-const svgPath = path.join(__dirname, '../public/icon.svg');
+const faviconPath = path.join(__dirname, '../public/favicon.ico');
 const outputDir = path.join(__dirname, '../public');
 
 // Tamaños requeridos para PWA y favicon
@@ -14,16 +14,16 @@ const sizes = [
 
 async function generateIcons() {
   try {
-    // Leer el SVG
-    const svgBuffer = fs.readFileSync(svgPath);
+    // Leer el favicon.ico
+    const faviconBuffer = fs.readFileSync(faviconPath);
     
-    console.log('🎨 Generando íconos PWA...');
+    console.log('🎨 Generando íconos PWA desde favicon.ico...');
     
     // Generar cada tamaño
     for (const { size, name } of sizes) {
       const outputPath = path.join(outputDir, name);
       
-      await sharp(svgBuffer)
+      await sharp(faviconBuffer)
         .resize(size, size, {
           fit: 'contain',
           background: { r: 255, g: 255, b: 255, alpha: 0 }
@@ -34,10 +34,9 @@ async function generateIcons() {
       console.log(`✅ Generado: ${name}`);
     }
     
-    // Copiar el PNG de 32x32 como favicon (los navegadores modernos soportan PNG)
-    // Para compatibilidad, también generamos un 16x16
+    // Generar favicon-16x16.png para compatibilidad
     const favicon16Path = path.join(outputDir, 'favicon-16x16.png');
-    await sharp(svgBuffer)
+    await sharp(faviconBuffer)
       .resize(16, 16, {
         fit: 'contain',
         background: { r: 255, g: 255, b: 255, alpha: 0 }
