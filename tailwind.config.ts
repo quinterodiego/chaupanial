@@ -37,11 +37,11 @@ const config: Config = {
           900: '#134e4a',
           // Colores pastel para el degradado
           pastel: {
-            sky: '#A8D8EA',
-            rose: '#FFB3BA',
+            sky: '#8CCFE0',
+            rose: '#E9A5B4',
             light: {
-              sky: '#B8E0F0',
-              rose: '#FFC3C0',
+              sky: '#9CDFF0',
+              rose: '#F9B5C4',
             },
           },
         },

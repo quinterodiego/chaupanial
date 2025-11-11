@@ -33,7 +33,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
-        <meta name="theme-color" content="#A8D8EA" />
+        <meta name="theme-color" content="#8CCFE0" />
       </head>
       <body className={`${inter.className} app-container`} suppressHydrationWarning>
         <AuthProvider>

@@ -40,14 +40,14 @@ export default function Home() {
         <section className="relative container mx-auto px-4 py-20 md:py-32 text-center overflow-hidden">
           {/* Background decoration */}
           <div className="absolute inset-0 -z-10 overflow-hidden">
-            <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#A8D8EA] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-            <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#FFB3BA] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-[#B8E0F0] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+            <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#8CCFE0] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+            <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#E9A5B4] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-[#9CDFF0] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
           </div>
 
           <div className="max-w-5xl mx-auto animate-fade-in">
             <div className="inline-block mb-6 animate-slide-in">
-              <span className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm text-gray-700 px-5 py-2.5 rounded-full text-sm font-semibold shadow-md border border-[#A8D8EA]/30">
+              <span className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm text-gray-700 px-5 py-2.5 rounded-full text-sm font-semibold shadow-md border border-[#8CCFE0]/30">
                 🍼 Tu compañero en el control de esfínteres
               </span>
             </div>
@@ -71,7 +71,7 @@ export default function Home() {
                 <>
                   <Button 
                     size="lg" 
-                    className="text-lg px-10 py-7 bg-gradient-to-r from-[#A8D8EA] via-[#B8E0F0] to-[#FFB3BA] hover:from-[#98C8DA] hover:via-[#A8D0E0] hover:to-[#EFA3AA] text-gray-700 shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 font-semibold"
+                    className="text-lg px-10 py-7 bg-gradient-to-r from-[#8CCFE0] to-[#E9A5B4] hover:from-[#7CBFD0] hover:to-[#D995A4] text-[#1E293B] shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 font-semibold"
                     onClick={handleGetStarted}
                   >
                     🚀 Comenzar Gratis
@@ -80,7 +80,7 @@ export default function Home() {
                   <Button 
                     size="lg" 
                     variant="outline"
-                    className="text-lg px-10 py-7 border-2 border-gray-300 hover:border-primary-400 hover:bg-primary-50 transition-all transform hover:scale-105 font-semibold text-gray-700"
+                    className="text-lg px-10 py-7 border-2 border-[#CBD5E1] bg-white text-[#1E293B] hover:bg-gray-50 transition-all transform hover:scale-105 font-semibold"
                     onClick={() => router.push('/premium')}
                   >
                     <Crown className="mr-2" size={20} />
@@ -224,7 +224,7 @@ export default function Home() {
             </div>
 
             {/* Premium Plan */}
-            <div className="bg-gradient-to-br from-[#A8D8EA] to-[#FFB3BA] rounded-3xl shadow-2xl p-8 border-4 border-yellow-300 relative transform scale-105">
+            <div className="bg-gradient-to-br from-[#8CCFE0] to-[#E9A5B4] rounded-3xl shadow-2xl p-8 border-4 border-yellow-300 relative transform scale-105">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                 <span className="bg-yellow-400 text-gray-700 px-6 py-2 rounded-full text-sm font-bold shadow-lg">
                   ⭐ Más Popular
@@ -355,7 +355,7 @@ export default function Home() {
         </section>
 
         {/* Final CTA Section */}
-        <section className="container mx-auto px-4 py-20 bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] text-gray-700 text-center">
+        <section className="container mx-auto px-4 py-20 bg-gradient-to-r from-[#8CCFE0] to-[#E9A5B4] text-[#1E293B] text-center">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-4xl md:text-6xl font-bold mb-6">
               ¿Listo para comenzar?

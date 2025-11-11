@@ -26,12 +26,13 @@ export function Header() {
           className="flex items-center space-x-2 sm:space-x-3 cursor-pointer group flex-shrink-0"
           onClick={() => router.push('/')}
         >
-          <div className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#A8D8EA] to-[#FFB3BA] text-gray-800 shadow-lg group-hover:shadow-xl transition-shadow">
+          <div className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#8CCFE0] to-[#E9A5B4] text-gray-800 shadow-lg group-hover:shadow-xl transition-shadow">
             <Baby size={20} className="sm:w-6 sm:h-6 text-gray-600" />
           </div>
           <div className="flex flex-col">
-            <h1 className="text-base sm:text-xl font-bold bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] bg-clip-text text-transparent">
-              Chau Pañal
+            <h1 className="text-base sm:text-xl font-bold">
+              <span className="text-[#1E293B]">Chau</span>{' '}
+              <span className="bg-gradient-to-r from-[#8CCFE0] to-[#E9A5B4] bg-clip-text text-transparent">Pañal</span>
             </h1>
             <p className="text-xs text-gray-600 hidden sm:block">Tu compañero en el control de esfínteres</p>
           </div>
@@ -45,9 +46,9 @@ export function Header() {
                   variant="outline"
                   size="sm"
                   onClick={() => router.push('/premium')}
-                  className="hidden sm:flex items-center gap-2 border-yellow-300 text-yellow-700 hover:bg-yellow-50 px-2 sm:px-3"
+                  className="hidden sm:flex items-center gap-2 border-[#CBD5E1] bg-white text-[#1E293B] hover:bg-gray-50 px-2 sm:px-3"
                 >
-                  <Crown size={14} className="text-yellow-600" />
+                  <Crown size={14} className="text-[#1E293B]" />
                   <span className="text-xs sm:text-sm">Premium</span>
                 </Button>
               )}
@@ -98,7 +99,7 @@ export function Header() {
           ) : (
             <Button 
               onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
-              className="bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] hover:from-[#98C8DA] hover:to-[#EFA3AA] text-gray-600 shadow-md hover:shadow-lg transition-all px-3 sm:px-4 text-xs sm:text-sm"
+              className="bg-gradient-to-r from-[#8CCFE0] to-[#E9A5B4] hover:from-[#7CBFD0] hover:to-[#D995A4] text-[#1E293B] shadow-md hover:shadow-lg transition-all px-3 sm:px-4 text-xs sm:text-sm font-medium"
             >
               <User size={16} className="mr-1 sm:mr-2 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">Iniciar Sesión</span>
