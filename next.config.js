@@ -24,6 +24,14 @@ const nextConfig = {
   experimental: {
     webpackBuildWorker: false,
   },
+  // Usar output standalone para evitar problemas con build traces
+  output: 'standalone',
+  // Excluir node_modules del análisis de build traces para evitar stack overflow
+  outputFileTracingExcludes: {
+    '*': [
+      'node_modules/**/*',
+    ],
+  },
   // Configuración de webpack para evitar problemas
   webpack: (config, { isServer }) => {
     if (!isServer) {
