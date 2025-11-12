@@ -137,10 +137,9 @@ export default function Home() {
             />
             <FeatureCard
               icon={<TrendingUp />}
-              title="Estadísticas y gráficos"
-              description="Visualiza el progreso con contadores diarios (gratis) o gráficos avanzados completos (Premium)."
+              title="Estadísticas básicas"
+              description="Visualiza el progreso con contadores diarios de esfínteres. Estadísticas disponibles en ambos planes."
               free={true}
-              premium={true}
             />
             <FeatureCard
               icon={<Calendar />}
@@ -181,9 +180,9 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto items-stretch">
             {/* Free Plan */}
-            <div className="bg-white rounded-3xl shadow-xl p-8 border-2 border-gray-200">
+            <div className="bg-white rounded-3xl shadow-xl p-8 border-2 border-gray-200 flex flex-col">
               <div className="text-center mb-8">
                 <h3 className="text-2xl font-bold mb-2 text-gray-700">Gratis</h3>
                 <div className="text-5xl font-bold text-gray-700 mb-2">
@@ -192,7 +191,7 @@ export default function Home() {
                 <p className="text-gray-700">Siempre gratis</p>
               </div>
               
-              <ul className="space-y-4 mb-8">
+              <ul className="space-y-4 mb-8 flex-grow">
                 <li className="flex items-start">
                   <CheckCircle className="text-green-500 mr-3 mt-1 flex-shrink-0" size={20} />
                   <span>Registro de esfínteres (hasta 50 por mes)</span>
@@ -208,10 +207,6 @@ export default function Home() {
                 <li className="flex items-start">
                   <CheckCircle className="text-green-500 mr-3 mt-1 flex-shrink-0" size={20} />
                   <span>Vista de calendario (últimos 30 días)</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="text-green-500 mr-3 mt-1 flex-shrink-0" size={20} />
-                  <span>Vista de gráficos (últimos 30 días)</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="text-green-500 mr-3 mt-1 flex-shrink-0" size={20} />
@@ -232,7 +227,7 @@ export default function Home() {
               </ul>
               
               <Button 
-                className="w-full" 
+                className="w-full mt-auto" 
                 size="lg"
                 variant="outline"
                 onClick={handleGetStarted}
@@ -242,7 +237,7 @@ export default function Home() {
             </div>
 
             {/* Premium Plan */}
-            <div className="bg-gradient-to-br from-[#8CCFE0] to-[#E9A5B4] rounded-3xl shadow-2xl p-8 border-4 border-yellow-300 relative transform scale-105">
+            <div className="bg-gradient-to-br from-[#8CCFE0] to-[#E9A5B4] rounded-3xl shadow-2xl p-8 border-4 border-yellow-300 relative flex flex-col">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                 <span className="bg-yellow-400 text-gray-700 px-6 py-2 rounded-full text-sm font-bold shadow-lg">
                   ⭐ Más Popular
@@ -260,7 +255,7 @@ export default function Home() {
                 <p className="text-gray-700">Pago único - Para siempre</p>
               </div>
               
-              <ul className="space-y-4 mb-8 text-gray-800">
+              <ul className="space-y-4 mb-8 text-gray-800 flex-grow">
                 <li className="flex items-start">
                   <CheckCircle className="text-yellow-500 mr-3 mt-1 flex-shrink-0" size={20} />
                   <span className="text-gray-700"><strong>Todo lo gratis +</strong></span>
@@ -275,10 +270,6 @@ export default function Home() {
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="text-yellow-500 mr-3 mt-1 flex-shrink-0" size={20} />
-                  <span>Gráficos y estadísticas avanzadas (completos)</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="text-yellow-500 mr-3 mt-1 flex-shrink-0" size={20} />
                   <span>Calendario completo de progreso</span>
                 </li>
                 <li className="flex items-start">
@@ -289,10 +280,18 @@ export default function Home() {
                   <CheckCircle className="text-yellow-500 mr-3 mt-1 flex-shrink-0" size={20} />
                   <span>Compartir registros con familiares</span>
                 </li>
+                <li className="flex items-start">
+                  <CheckCircle className="text-yellow-500 mr-3 mt-1 flex-shrink-0" size={20} />
+                  <span>Exportar registros para pediatra (PDF)</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircle className="text-yellow-500 mr-3 mt-1 flex-shrink-0" size={20} />
+                  <span>Modo oscuro</span>
+                </li>
               </ul>
               
               <Button 
-                className="w-full bg-white text-blue-600 hover:bg-gray-100 font-bold" 
+                className="w-full mt-auto bg-white text-blue-600 hover:bg-gray-100 font-bold" 
                 size="lg"
                 onClick={() => router.push('/premium')}
               >
@@ -347,11 +346,11 @@ export default function Home() {
           <div className="max-w-3xl mx-auto space-y-6">
             <FAQItem
               question="¿Es realmente gratis?"
-              answer="Sí, la versión gratuita es completamente gratis para siempre. Incluye registro de esfínteres (hasta 50 por mes), historial de últimos 30 días, estadísticas básicas, vista de calendario y gráficos (30 días), edición y eliminación de registros, búsqueda y filtros, tips diarios y acceso a la comunidad."
+              answer="Sí, la versión gratuita es completamente gratis para siempre. Incluye registro de esfínteres (hasta 50 por mes), historial de últimos 30 días, estadísticas básicas, vista de calendario (30 días), edición y eliminación de registros, búsqueda y filtros, tips diarios y acceso a la comunidad."
             />
             <FAQItem
               question="¿Qué incluye Premium?"
-              answer="Premium incluye todo lo gratis más: registros ilimitados (sin límite mensual), historial completo (sin límite de días), gráficos y estadísticas avanzadas completos, calendario completo de progreso, gestión de familia (múltiples bebés) y compartir registros con familiares."
+              answer="Premium incluye todo lo gratis más: registros ilimitados (sin límite mensual), historial completo (sin límite de días), calendario completo de progreso, gestión de familia (múltiples bebés), compartir registros con familiares, exportar registros para pediatra en formato PDF y modo oscuro."
             />
             <FAQItem
               question="¿Puedo usar la app sin internet?"

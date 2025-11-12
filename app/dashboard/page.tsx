@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Header } from '../components/Header'
 import { Button } from '../components/ui/button'
-import { Plus, Baby, Calendar, TrendingUp, Crown, AlertCircle, Droplet, X, Eye, Search, Zap, Trophy, Lightbulb, ChevronDown, ChevronUp, Edit, Trash2, Save, Clock } from 'lucide-react'
+import { Plus, Baby, Calendar, TrendingUp, Crown, AlertCircle, Droplet, X, Eye, Search, Zap, Trophy, Lightbulb, ChevronDown, ChevronUp, Edit, Trash2, Save, Clock, FileText, Download } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { CalendarView } from '../components/CalendarView'
 import { ChartsView } from '../components/ChartsView'
@@ -748,7 +748,22 @@ export default function Dashboard() {
             </div>
           </Button>
 
-          {!isPremium && (
+          {isPremium ? (
+            <Button
+              onClick={() => {
+                // TODO: Implementar exportación de registros para pediatra
+                alert('Funcionalidad de exportación próximamente disponible')
+              }}
+              className="h-24 bg-white hover:bg-gray-50 text-gray-800 shadow-lg"
+              variant="outline"
+            >
+              <FileText className="mr-3" size={24} />
+              <div className="text-left">
+                <p className="font-semibold">Exportar para Pediatra</p>
+                <p className="text-sm text-gray-600">Generar reporte PDF</p>
+              </div>
+            </Button>
+          ) : (
             <Button
               onClick={() => router.push('/premium')}
               className="h-24 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-white shadow-lg"
