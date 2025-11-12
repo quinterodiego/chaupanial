@@ -8,7 +8,7 @@ import { Button } from './components/ui/button'
 import { 
   Baby, Calendar, Users, Heart, Crown, CheckCircle, 
   Shield, Clock, Star, ArrowRight, Smartphone, 
-  FileText, MessageCircle, TrendingUp, Award, Droplet
+  FileText, MessageCircle, TrendingUp, Award, Droplet, Lightbulb
 } from 'lucide-react'
 
 export default function Home() {
@@ -132,32 +132,34 @@ export default function Home() {
             <FeatureCard
               icon={<Droplet />}
               title="Registro de esfínteres"
-              description="Registra cada vez que tu bebé usa el baño. Historial completo y seguimiento diario."
-              free={true}
-            />
-            <FeatureCard
-              icon={<Clock />}
-              title="Recordatorios inteligentes"
-              description="Recordatorios personalizados para llevar a tu bebé al baño. Adaptados a sus horarios."
+              description="Registra cada vez que tu bebé usa el baño. Historial de 30 días en gratis, ilimitado en Premium."
               free={true}
             />
             <FeatureCard
               icon={<TrendingUp />}
-              title="Gráficos y estadísticas"
-              description="Visualiza el progreso del control de esfínteres. Patrones, avances y análisis detallados con Premium."
-              premium={true}
-            />
-            <FeatureCard
-              icon={<FileText />}
-              title="Guías y tips"
-              description="Consejos prácticos y guías especializadas para el proceso de control de esfínteres."
+              title="Estadísticas y gráficos"
+              description="Visualiza el progreso con contadores diarios (gratis) o gráficos avanzados completos (Premium)."
+              free={true}
               premium={true}
             />
             <FeatureCard
               icon={<Calendar />}
               title="Calendario de progreso"
-              description="Visualiza el avance día a día. Días secos, accidentes y logros importantes."
+              description="Vista de calendario con últimos 30 días (gratis) o calendario completo sin límites (Premium)."
+              free={true}
               premium={true}
+            />
+            <FeatureCard
+              icon={<Users />}
+              title="Gestión de familia"
+              description="Comparte registros con familiares y gestiona múltiples bebés. Solo disponible en Premium."
+              premium={true}
+            />
+            <FeatureCard
+              icon={<Lightbulb />}
+              title="Tips diarios"
+              description="Consejos prácticos diarios sobre control de esfínteres para acompañar el proceso."
+              free={true}
             />
             <FeatureCard
               icon={<MessageCircle />}
@@ -193,11 +195,31 @@ export default function Home() {
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start">
                   <CheckCircle className="text-green-500 mr-3 mt-1 flex-shrink-0" size={20} />
-                  <span>Registro de esfínteres (30 días)</span>
+                  <span>Registro de esfínteres (hasta 50 por mes)</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="text-green-500 mr-3 mt-1 flex-shrink-0" size={20} />
-                  <span>Recordatorios básicos</span>
+                  <span>Historial de últimos 30 días</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircle className="text-green-500 mr-3 mt-1 flex-shrink-0" size={20} />
+                  <span>Estadísticas básicas (contadores diarios)</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircle className="text-green-500 mr-3 mt-1 flex-shrink-0" size={20} />
+                  <span>Vista de calendario (últimos 30 días)</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircle className="text-green-500 mr-3 mt-1 flex-shrink-0" size={20} />
+                  <span>Vista de gráficos (últimos 30 días)</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircle className="text-green-500 mr-3 mt-1 flex-shrink-0" size={20} />
+                  <span>Editar y eliminar registros</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircle className="text-green-500 mr-3 mt-1 flex-shrink-0" size={20} />
+                  <span>Búsqueda y filtros de registros</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="text-green-500 mr-3 mt-1 flex-shrink-0" size={20} />
@@ -206,10 +228,6 @@ export default function Home() {
                 <li className="flex items-start">
                   <CheckCircle className="text-green-500 mr-3 mt-1 flex-shrink-0" size={20} />
                   <span>Comunidad de padres</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="text-green-500 mr-3 mt-1 flex-shrink-0" size={20} />
-                  <span>Hasta 50 registros por mes</span>
                 </li>
               </ul>
               
@@ -249,31 +267,27 @@ export default function Home() {
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="text-yellow-500 mr-3 mt-1 flex-shrink-0" size={20} />
-                  <span>Gráficos y estadísticas avanzadas</span>
+                  <span>Registros ilimitados (sin límite mensual)</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="text-yellow-500 mr-3 mt-1 flex-shrink-0" size={20} />
-                  <span>Historial ilimitado de esfínteres</span>
+                  <span>Historial completo (sin límite de días)</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="text-yellow-500 mr-3 mt-1 flex-shrink-0" size={20} />
-                  <span>Calendario de progreso</span>
+                  <span>Gráficos y estadísticas avanzadas (completos)</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="text-yellow-500 mr-3 mt-1 flex-shrink-0" size={20} />
-                  <span>Múltiples bebés (hasta 5)</span>
+                  <span>Calendario completo de progreso</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="text-yellow-500 mr-3 mt-1 flex-shrink-0" size={20} />
-                  <span>Guías y tips especializados</span>
+                  <span>Gestión de familia (múltiples bebés)</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="text-yellow-500 mr-3 mt-1 flex-shrink-0" size={20} />
-                  <span>Sin publicidad</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="text-yellow-500 mr-3 mt-1 flex-shrink-0" size={20} />
-                  <span>Soporte prioritario</span>
+                  <span>Compartir registros con familiares</span>
                 </li>
               </ul>
               
@@ -333,11 +347,11 @@ export default function Home() {
           <div className="max-w-3xl mx-auto space-y-6">
             <FAQItem
               question="¿Es realmente gratis?"
-              answer="Sí, la versión gratuita es completamente gratis para siempre. Incluye registro básico de esfínteres (30 días), recordatorios básicos, tips diarios sobre control de esfínteres y acceso a la comunidad."
+              answer="Sí, la versión gratuita es completamente gratis para siempre. Incluye registro de esfínteres (hasta 50 por mes), historial de últimos 30 días, estadísticas básicas, vista de calendario y gráficos (30 días), edición y eliminación de registros, búsqueda y filtros, tips diarios y acceso a la comunidad."
             />
             <FAQItem
               question="¿Qué incluye Premium?"
-              answer="Premium incluye todo lo gratis más: gráficos y estadísticas avanzadas del control de esfínteres, historial ilimitado, calendario de progreso, guías especializadas, múltiples bebés, sin publicidad y soporte prioritario."
+              answer="Premium incluye todo lo gratis más: registros ilimitados (sin límite mensual), historial completo (sin límite de días), gráficos y estadísticas avanzadas completos, calendario completo de progreso, gestión de familia (múltiples bebés) y compartir registros con familiares."
             />
             <FAQItem
               question="¿Puedo usar la app sin internet?"
