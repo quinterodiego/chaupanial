@@ -2,28 +2,30 @@ const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
 
-const faviconPath = path.join(__dirname, '../public/favicon.ico');
+const logoPath = path.join(__dirname, '../public/logo.png');
 const outputDir = path.join(__dirname, '../public');
 
-// Tamaños requeridos para PWA y favicon
+// Tamaños requeridos para PWA
 const sizes = [
-  { size: 32, name: 'favicon-32x32.png' },
   { size: 192, name: 'icon-192x192.png' },
   { size: 512, name: 'icon-512x512.png' }
 ];
 
 async function generateIcons() {
   try {
-    // Leer el favicon.ico
-    const faviconBuffer = fs.readFileSync(faviconPath);
+    // Verificar que el logo existe
+    if (!fs.existsSync(logoPath)) {
+      console.error('❌ Error: No se encontró logo.png en la carpeta public/');
+      process.exit(1);
+    }
     
-    console.log('🎨 Generando íconos PWA desde favicon.ico...');
+    console.log('🎨 Generando íconos PWA desde logo.png...');
     
     // Generar cada tamaño
     for (const { size, name } of sizes) {
       const outputPath = path.join(outputDir, name);
       
-      await sharp(faviconBuffer)
+      await sharp(logoPath)
         .resize(size, size, {
           fit: 'contain',
           background: { r: 255, g: 255, b: 255, alpha: 0 }
@@ -33,18 +35,6 @@ async function generateIcons() {
       
       console.log(`✅ Generado: ${name}`);
     }
-    
-    // Generar favicon-16x16.png para compatibilidad
-    const favicon16Path = path.join(outputDir, 'favicon-16x16.png');
-    await sharp(faviconBuffer)
-      .resize(16, 16, {
-        fit: 'contain',
-        background: { r: 255, g: 255, b: 255, alpha: 0 }
-      })
-      .png()
-      .toFile(favicon16Path);
-    
-    console.log('✅ Generado: favicon-16x16.png');
     
     console.log('✨ ¡Íconos generados exitosamente!');
   } catch (error) {

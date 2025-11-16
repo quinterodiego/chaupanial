@@ -27,14 +27,14 @@ export function Header() {
           onClick={() => router.push('/')}
         >
           <div className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#8CCFE0] to-[#E9A5B4] text-gray-800 shadow-lg group-hover:shadow-xl transition-shadow">
-            <Baby size={20} className="sm:w-6 sm:h-6 text-gray-600" />
+            <img src="/logo.png" alt="Peque Diario" width={35} height={35} />
           </div>
           <div className="flex flex-col">
             <h1 className="text-base sm:text-xl font-bold">
-              <span className="text-[#1E293B]">Chau</span>{' '}
-              <span className="bg-gradient-to-r from-[#8CCFE0] to-[#E9A5B4] bg-clip-text text-transparent">Pañal</span>
+              <span className="text-[#1E293B]">Hola</span>{' '}
+              <span className="bg-gradient-to-r from-[#8CCFE0] to-[#E9A5B4] bg-clip-text text-transparent">Peque</span>
             </h1>
-            <p className="text-xs text-gray-600 hidden sm:block">Tu compañero en el control de esfínteres</p>
+            <p className="text-xs text-gray-600 hidden sm:block">Acompañando el crecimiento de tu hijo</p>
           </div>
         </div>
         

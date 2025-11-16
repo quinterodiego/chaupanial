@@ -2,8 +2,7 @@
 
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Header } from '../../components/Header'
-import { Button } from '../../components/ui/button'
+import { Button } from '../../../components/ui/button'
 import { ArrowLeft, Droplet, Calendar, Clock } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
@@ -72,8 +71,8 @@ export default function RegistroPage() {
         throw new Error(data.error || 'Error al guardar')
       }
 
-      // Éxito - redirigir al dashboard
-      router.push('/dashboard')
+      // Éxito - redirigir al dashboard de esfínteres
+      router.push('/dashboard/esfinteres')
     } catch (err: any) {
       setError(err.message || 'Error al guardar la actividad')
     } finally {
@@ -92,110 +91,108 @@ export default function RegistroPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-      <Header />
-      
-      <main className="container mx-auto px-4 py-8 max-w-2xl">
+    <div>
+      <div className="mb-6">
         <Button
-          onClick={() => router.back()}
+          onClick={() => router.push('/dashboard/esfinteres')}
           variant="ghost"
-          className="mb-6"
+          className="mb-4"
         >
           <ArrowLeft className="mr-2" size={16} />
           Volver
         </Button>
 
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">
           Registrar Esfínteres
         </h1>
+      </div>
 
-        {error && (
-          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
-            {error}
+      {error && (
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
+          {error}
+        </div>
+      )}
+
+      {/* Formulario de Esfínteres */}
+      <div className="bg-white rounded-2xl p-6 shadow-lg">
+        <h2 className="text-xl font-bold mb-6">Registrar Control de Esfínteres</h2>
+        
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Tipo de registro
+            </label>
+            <select
+              value={esfinterType}
+              onChange={(e) => setEsfinterType(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="pipi">Pis</option>
+              <option value="caca">Caca</option>
+              <option value="pipi-caca">Pis y Caca</option>
+              <option value="seco">Seco (sin nada)</option>
+            </select>
           </div>
-        )}
 
-        {/* Formulario de Esfínteres */}
-        <div className="bg-white rounded-2xl p-6 shadow-lg">
-          <h2 className="text-xl font-bold mb-6">Registrar Control de Esfínteres</h2>
-          
-          <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Tipo de registro
+                <Calendar className="inline mr-2" size={16} />
+                Fecha
               </label>
-              <select
-                value={esfinterType}
-                onChange={(e) => setEsfinterType(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="pipi">Pis</option>
-                <option value="caca">Caca</option>
-                <option value="pipi-caca">Pis y Caca</option>
-                <option value="seco">Seco (sin nada)</option>
-              </select>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Calendar className="inline mr-2" size={16} />
-                  Fecha
-                </label>
-                <input
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  max={maxDate} // No permitir fechas futuras
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Clock className="inline mr-2" size={16} />
-                  Hora
-                </label>
-                <input
-                  type="time"
-                  value={selectedTime}
-                  onChange={(e) => setSelectedTime(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Notas (opcional)
-              </label>
-              <textarea
-                value={esfinterNotes}
-                onChange={(e) => setEsfinterNotes(e.target.value)}
-                placeholder="Observaciones adicionales... (ej: en el baño, en el orinal, etc.)"
-                rows={3}
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                max={maxDate} // No permitir fechas futuras
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
-
-            <div className="flex gap-4 pt-4">
-              <Button
-                onClick={() => router.back()}
-                variant="outline"
-                className="flex-1"
-              >
-                Cancelar
-              </Button>
-              <Button
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                className="flex-1 bg-gradient-to-r from-[#A8D8EA] to-[#FFB3BA] hover:from-[#98C8DA] hover:to-[#EFA3AA] text-white"
-              >
-                {isSubmitting ? 'Guardando...' : 'Guardar Registro'}
-              </Button>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Clock className="inline mr-2" size={16} />
+                Hora
+              </label>
+              <input
+                type="time"
+                value={selectedTime}
+                onChange={(e) => setSelectedTime(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
             </div>
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Notas (opcional)
+            </label>
+            <textarea
+              value={esfinterNotes}
+              onChange={(e) => setEsfinterNotes(e.target.value)}
+              placeholder="Observaciones adicionales... (ej: en el baño, en el orinal, etc.)"
+              rows={3}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          <div className="flex gap-4 pt-4">
+            <Button
+              onClick={() => router.push('/dashboard/esfinteres')}
+              variant="outline"
+              className="flex-1"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="flex-1 bg-gradient-to-r from-[#8CCFE0] to-[#E9A5B4] hover:from-[#7CBFD0] hover:to-[#D995A4] text-[#1E293B]"
+            >
+              {isSubmitting ? 'Guardando...' : 'Guardar Registro'}
+            </Button>
+          </div>
         </div>
-      </main>
+      </div>
     </div>
   )
 }

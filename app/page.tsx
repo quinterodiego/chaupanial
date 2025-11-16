@@ -10,6 +10,7 @@ import {
   Shield, Clock, Star, ArrowRight, Smartphone, 
   FileText, MessageCircle, TrendingUp, Award, Droplet, Lightbulb
 } from 'lucide-react'
+import { formatNumberAR } from '@/lib/utils'
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -48,22 +49,22 @@ export default function Home() {
           <div className="max-w-5xl mx-auto animate-fade-in">
             <div className="inline-block mb-6 animate-slide-in">
               <span className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm text-gray-700 px-5 py-2.5 rounded-full text-sm font-semibold shadow-md border border-[#8CCFE0]/30">
-                🍼 Tu compañero en el control de esfínteres
+                👶 Acompañando el crecimiento desde el nacimiento
               </span>
             </div>
             
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold text-gray-700 mb-6 leading-tight tracking-tight">
-              Chau{' '}
+              Peque{' '}
               <span className="gradient-text">
-                Pañal
+                Diario
               </span>
             </h1>
             
             <p className="text-xl md:text-2xl lg:text-3xl text-gray-700 mb-10 max-w-3xl mx-auto leading-relaxed font-light">
-              La app para acompañar a tu bebé en el proceso de{' '}
-              <span className="font-semibold text-gray-800">control de esfínteres</span>.
+              La app integral para padres que acompaña el{' '}
+              <span className="font-semibold text-gray-800">crecimiento de tu hijo</span>.
               <br className="hidden md:block" />
-              <span className="text-gray-500">Registros, seguimiento y tips para este momento tan importante.</span>
+              <span className="text-gray-500">Crecimiento, sueño, alimentación, hitos y control de esfínteres en un solo lugar.</span>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
@@ -107,7 +108,7 @@ export default function Home() {
               </div>
               <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover-lift">
                 <div className="text-4xl md:text-5xl font-extrabold gradient-text mb-2">5000+</div>
-                <div className="text-sm text-gray-700 font-medium">Registros de esfínteres</div>
+                <div className="text-sm text-gray-700 font-medium">Registros totales</div>
               </div>
               <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover-lift">
                 <div className="text-4xl md:text-5xl font-extrabold gradient-text mb-2">4.9★</div>
@@ -121,10 +122,10 @@ export default function Home() {
         <section className="relative container mx-auto px-4 py-24 bg-gray-50">
           <div className="text-center mb-16 animate-fade-in">
             <h2 className="text-4xl md:text-6xl font-extrabold text-gray-700 mb-6 tracking-tight">
-              Todo para el control de esfínteres
+              Todo para acompañar el crecimiento
             </h2>
             <p className="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto font-light">
-              Funcionalidades diseñadas para acompañar a tu bebé en este proceso tan importante
+              Funcionalidades diseñadas para acompañar a tu hijo desde el nacimiento
             </p>
           </div>
 
@@ -250,7 +251,7 @@ export default function Home() {
                   <h3 className="text-2xl font-bold">Premium</h3>
                 </div>
                 <div className="text-5xl font-bold mb-2">
-                  $28.999
+                  ${formatNumberAR(28999, 0)}
                 </div>
                 <p className="text-gray-700">Pago único - Para siempre</p>
               </div>
@@ -374,7 +375,7 @@ export default function Home() {
               ¿Listo para comenzar?
             </h2>
             <p className="text-xl md:text-2xl mb-8 text-gray-700">
-              Únete a miles de padres que ya están acompañando a sus bebés en el control de esfínteres
+              Únete a miles de padres que ya están acompañando el crecimiento de sus hijos
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               {!session ? (

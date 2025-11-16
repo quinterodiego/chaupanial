@@ -212,7 +212,7 @@ export class GoogleSheetsService {
   static async saveActivity(data: {
     userEmail: string
     babyName: string
-    activityType: 'feeding' | 'sleep' | 'diaper' | 'milestone' | 'esfinteres'
+    activityType: 'feeding' | 'sleep' | 'diaper' | 'milestone' | 'esfinteres' | 'growth'
     details: any
     timestamp: Date
   }) {

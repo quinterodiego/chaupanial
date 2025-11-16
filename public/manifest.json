@@ -1,7 +1,7 @@
 {
-  "name": "Chau Pañal - Control de Esfínteres",
-  "short_name": "Chau Pañal",
-  "description": "La app para acompañar a tu bebé en el proceso de control de esfínteres. Registros, seguimiento y tips.",
+  "name": "Peque Diario - Acompañando el crecimiento",
+  "short_name": "Peque Diario",
+  "description": "La app integral para padres que acompaña el crecimiento de tu hijo desde el nacimiento.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

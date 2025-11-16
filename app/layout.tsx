@@ -6,8 +6,8 @@ import { Toaster } from './components/ui/toaster'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Chau Pañal - Control de Esfínteres',
-  description: 'La app para acompañar a tu bebé en el proceso de control de esfínteres. Registros, seguimiento y tips para este momento tan importante.',
+  title: 'Peque Diario - Acompañando el crecimiento de tu hijo',
+  description: 'La app integral para padres que acompaña el crecimiento de tu hijo desde el nacimiento. Registro de crecimiento, sueño, alimentación, hitos y control de esfínteres.',
   manifest: '/manifest.json',
   icons: {
     icon: '/favicon.ico',
@@ -41,6 +41,14 @@ export default function RootLayout({
           <div className="safe-area">
             {children}
           </div>
+          <footer className="bg-gray-50 border-t border-gray-200 py-6 mt-12">
+            <div className="container mx-auto px-4 text-center text-sm text-gray-600">
+              <p className="mb-2">
+                <strong>Peque Diario</strong> no reemplaza la consulta con pediatras ni otros profesionales de la salud.
+              </p>
+              <p>© {new Date().getFullYear()} Peque Diario. Todos los derechos reservados.</p>
+            </div>
+          </footer>
           <Toaster />
         </AuthProvider>
       </body>
