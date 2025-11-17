@@ -10,7 +10,10 @@ export const metadata = {
   description: 'La app integral para padres que acompaña el crecimiento de tu hijo desde el nacimiento. Registro de crecimiento, sueño, alimentación, hitos y control de esfínteres.',
   manifest: '/manifest.json',
   icons: {
-    icon: '/favicon.ico',
+    icon: [
+      { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
+      { url: '/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+    ],
     apple: '/icon-192x192.png',
   },
 }
@@ -32,7 +35,7 @@ export default function RootLayout({
     <html lang="es">
       <head>
         <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+        <link rel="icon" href="/icon-192x192.png" type="image/png" sizes="192x192" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
         <meta name="theme-color" content="#8CCFE0" />
       </head>
