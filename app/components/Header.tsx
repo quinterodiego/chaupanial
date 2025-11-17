@@ -26,9 +26,8 @@ export function Header() {
           className="flex items-center space-x-2 sm:space-x-3 cursor-pointer group flex-shrink-0"
           onClick={() => router.push('/')}
         >
-          <div className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#8CCFE0] to-[#E9A5B4] text-gray-800 shadow-lg group-hover:shadow-xl transition-shadow">
-            <img src="/logo.png" alt="Peque Diario" width={34} height={34} />
-          </div>
+          <img src="/logo.png" alt="Peque Diario" width={40} height={40} />
+          
           <div className="flex flex-col">
             <h1 className="text-base sm:text-xl font-bold">
               <span className="bg-gradient-to-r from-[#8CCFE0] to-[#E9A5B4] bg-clip-text text-transparent">Peque</span>
